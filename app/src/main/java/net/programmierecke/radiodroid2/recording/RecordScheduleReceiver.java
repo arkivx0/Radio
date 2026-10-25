@@ -29,6 +29,10 @@ public class RecordScheduleReceiver extends BroadcastReceiver {
         }
         RecordSchedules.rescheduleAll(context);
 
+        if (it.silent) {
+            SilentRecordService.start(context, it.stationJson, it.durationMin);
+            return;
+        }
         Intent svc = new Intent(context, PlayerService.class);
         svc.setAction(PlayerService.ACTION_SCHEDULED_RECORD);
         svc.putExtra(PlayerService.EXTRA_REC_STATION, it.stationJson);

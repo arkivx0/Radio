@@ -58,7 +58,7 @@
     <string name="nav_item_settings">Settings</string>
     <string name="nav_item_alarm">Alarm</string>
 
-    <string name="about_text">Radio Arkiv is a fork of RadioDroid, maintained at\nhttps://github.com/arkivx0/RadioArkiv\n\nBased on RadioDroid by segler-alex and contributors:\nhttps://github.com/segler-alex/RadioDroid\n\nBugs and feature requests for this fork:\nhttps://github.com/arkivx0/RadioArkiv/issues\n\nThis app uses the free radio station directory at\nhttps://www.radio-browser.info\nEveryone can add stations to it. It works like a wiki for online (streaming) radio stations.\n\nBundled fonts: VT323 and Limelight, SIL Open Font License 1.1.\n\nThis app is free software licensed under the GNU General Public License v3.0 (GPL-3.0).\nhttps://www.gnu.org/licenses/gpl-3.0.html</string>
+    <string name="about_text">Radio Arkiv is a fork of RadioDroid, maintained at\nhttps://github.com/arkivx0/RadioArkiv\n\nBased on RadioDroid 0.86 by segler-alex and contributors:\nhttps://github.com/segler-alex/RadioDroid\n\nBugs and feature requests for this fork:\nhttps://github.com/arkivx0/RadioArkiv/issues\n\nThis app uses the free radio station directory at\nhttps://www.radio-browser.info\nEveryone can add stations to it. It works like a wiki for online (streaming) radio stations.\n\nBundled fonts: VT323 and Limelight, SIL Open Font License 1.1.\n\nThis app is free software licensed under the GNU General Public License v3.0 (GPL-3.0).\nhttps://www.gnu.org/licenses/gpl-3.0.html</string>
     <string name="about_version">Version: %1$s</string>
     <string name="detail_star">Add to favorites</string>
     <string name="detail_unstar">Delete from favorites</string>
@@ -360,4 +360,8 @@
     <string name="error_no_app_for_recording">No other app can open this recording.</string>
     <string name="action_open_audio_file">Open audio file…</string>
     <string name="error_no_file_picker">No file picker available.</string>
+    <string name="silent_recording_channel">Silent recordings</string>
+    <string name="silent_recording_title">Recording %1$s</string>
+    <string name="silent_recording_text">Silent recording for %1$d min (not playing aloud)</string>
+    <string name="silent_recording_stop">Stop</string>
 </resources>

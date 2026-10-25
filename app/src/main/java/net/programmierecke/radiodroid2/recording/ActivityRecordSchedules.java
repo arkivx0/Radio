@@ -50,9 +50,13 @@ public class ActivityRecordSchedules extends AppCompatActivity {
         root.setPadding(p, p, p, p);
         Button add = new Button(this);
         add.setText("+ New scheduled recording");
-        add.setOnClickListener(v -> showAdd());
+        add.setOnClickListener(v -> showAdd(false));
         root.addView(add);
-        TextView hint = text("Files are saved to Music/Radio. Recording plays the stream while it records.", 12);
+        Button now = new Button(this);
+        now.setText("Record now silently");
+        now.setOnClickListener(v -> showAdd(true));
+        root.addView(now);
+        TextView hint = text("Files are saved to Music/Radio. Silent recordings download the stream without playing it.", 12);
         root.addView(hint);
         ScrollView sv = new ScrollView(this);
         list = new LinearLayout(this);
@@ -92,6 +96,12 @@ public class ActivityRecordSchedules extends AppCompatActivity {
                     it.enabled ? "next: " + df.format(new Date(it.nextFire)) : "done / disabled");
             TextView t = text(s, 14);
             row.addView(t, new LinearLayout.LayoutParams(0, -2, 1f));
+            CheckBox silent = new CheckBox(this);
+            silent.setText("silent");
+            silent.setTextSize(11);
+            silent.setChecked(it.silent);
+            silent.setOnCheckedChangeListener((b2, on) -> RecordSchedules.setSilent(this, it.id, on));
+            row.addView(silent);
             Button del = new Button(this);
             del.setText("Cancel");
             del.setOnClickListener(v -> {
@@ -103,7 +113,7 @@ public class ActivityRecordSchedules extends AppCompatActivity {
         }
     }
 
-    private void showAdd() {
+    private void showAdd(boolean recordNow) {
         RadioDroidApp app = (RadioDroidApp) getApplication();
         LinkedHashMap<String, DataRadioStation> stations = new LinkedHashMap<>();
         for (DataRadioStation s : app.getFavouriteManager().getList()) stations.put(s.StationUuid, s);
@@ -129,13 +139,18 @@ public class ActivityRecordSchedules extends AppCompatActivity {
             hm[0] = h; hm[1] = m;
             time.setText(String.format("Start %02d:%02d", h, m));
         }, hm[0], hm[1], android.text.format.DateFormat.is24HourFormat(this)).show());
-        f.addView(time);
+        if (!recordNow) f.addView(time);
         EditText dur = new EditText(this);
         dur.setInputType(InputType.TYPE_CLASS_NUMBER);
         dur.setHint("Duration (minutes)");
         dur.setText("60");
         f.addView(dur);
-        f.addView(text("Repeat (none = once):", 12));
+        CheckBox silentBox = new CheckBox(this);
+        silentBox.setText("Record silently (don't play aloud)");
+        silentBox.setChecked(true);
+        if (!recordNow) f.addView(silentBox);
+        TextView repeatLabel = text("Repeat (none = once):", 12);
+        if (!recordNow) f.addView(repeatLabel);
         LinearLayout days = new LinearLayout(this);
         CheckBox[] cb = new CheckBox[7];
         for (int i = 0; i < 7; i++) {
@@ -144,17 +159,23 @@ public class ActivityRecordSchedules extends AppCompatActivity {
             cb[i].setTextSize(11);
             days.addView(cb[i], new LinearLayout.LayoutParams(0, -2, 1f));
         }
-        f.addView(days);
+        if (!recordNow) f.addView(days);
 
         new AlertDialog.Builder(this)
-                .setTitle("Schedule recording")
+                .setTitle(recordNow ? "Record now (silent)" : "Schedule recording")
                 .setView(f)
                 .setPositiveButton("Save", (dlg, w) -> {
                     int mask = 0;
                     for (int i = 0; i < 7; i++) if (cb[i].isChecked()) mask |= 1 << i;
                     int minutes = 60;
                     try { minutes = Integer.parseInt(dur.getText().toString()); } catch (Exception ignored) { }
-                    RecordSchedules.add(this, st.get(sp.getSelectedItemPosition()), hm[0], hm[1], mask, minutes);
+                    DataRadioStation chosen = st.get(sp.getSelectedItemPosition());
+                    if (recordNow) {
+                        SilentRecordService.start(this, chosen.toJson().toString(), Math.max(1, minutes));
+                        Toast.makeText(this, "Recording " + chosen.Name + " for " + Math.max(1, minutes) + " min", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    RecordSchedules.add(this, chosen, hm[0], hm[1], mask, minutes, silentBox.isChecked());
                     refresh();
                 })
                 .setNegativeButton(android.R.string.cancel, null)

@@ -34,6 +34,7 @@ public class RecordSchedules {
         public int durationMin;
         public boolean enabled = true;
         public long nextFire;
+        public boolean silent = true; // record without playing aloud (default for old schedules too)
 
         public DataRadioStation station() {
             return DataRadioStation.DecodeJsonSingle(stationJson);
@@ -56,6 +57,7 @@ public class RecordSchedules {
                 it.durationMin = o.optInt("dur", 60);
                 it.enabled = o.optBoolean("en", true);
                 it.nextFire = o.optLong("next");
+                it.silent = o.optBoolean("silent", true);
                 out.add(it);
             }
         } catch (Exception e) {
@@ -71,7 +73,8 @@ public class RecordSchedules {
                 JSONObject o = new JSONObject();
                 o.put("id", it.id).put("st", it.stationJson).put("name", it.stationName)
                         .put("h", it.hour).put("m", it.minute).put("d", it.days)
-                        .put("dur", it.durationMin).put("en", it.enabled).put("next", it.nextFire);
+                        .put("dur", it.durationMin).put("en", it.enabled).put("next", it.nextFire)
+                        .put("silent", it.silent);
                 a.put(o);
             }
         } catch (Exception e) {
@@ -86,6 +89,16 @@ public class RecordSchedules {
     }
 
     public static Item add(Context c, DataRadioStation st, int h, int m, int days, int dur) {
+        return add(c, st, h, m, days, dur, true);
+    }
+
+    public static void setSilent(Context c, int id, boolean silent) {
+        List<Item> items = load(c);
+        for (Item i : items) if (i.id == id) i.silent = silent;
+        save(c, items);
+    }
+
+    public static Item add(Context c, DataRadioStation st, int h, int m, int days, int dur, boolean silent) {
         List<Item> items = load(c);
         Item it = new Item();
         int max = 0;
@@ -94,6 +107,7 @@ public class RecordSchedules {
         it.stationJson = st.toJson().toString();
         it.stationName = st.Name;
         it.hour = h; it.minute = m; it.days = days; it.durationMin = Math.max(1, dur);
+        it.silent = silent;
         items.add(it);
         save(c, items);
         rescheduleAll(c);
