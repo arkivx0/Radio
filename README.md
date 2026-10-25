@@ -3,7 +3,7 @@
 **Radio Arkiv** (formerly "Radio") is an unofficial fork of [RadioDroid](https://github.com/segler-alex/RadioDroid)
 by segler-alex and contributors, an Android internet-radio app built on the free
 [Radio Browser](https://www.radio-browser.info) station directory.
-Current version: **1.0.3** (based on RadioDroid 0.86).
+Current version: **1.0.4** (based on RadioDroid 0.86).
 It installs alongside upstream (`applicationId io.github.arkivx0.radio`).
 All credit for the app itself goes to the RadioDroid project. Licensed GPL-3.0 like upstream.
 
@@ -54,8 +54,8 @@ Download `RadioArkiv.apk` from [Releases](../../releases). APKs are signed with 
 
 - Signing certificate SHA-256:
   `291e1bccf7a19a6d0542a0a4c1af02aef42d305216534d798a85dc4187254861`
-- APK SHA-256 for 1.0.3:
-  `e162ef29db0d53d147ab825daa439e93a3a393413a7d6007485a15163398faab`
+- APK SHA-256 for 1.0.4:
+  `35d92a13cefd0c5519e967b6470dd2db99f5bb70ca03d1abd1226ba97a054ab7`
 
 Verify before installing:
 ```
