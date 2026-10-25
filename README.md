@@ -9,7 +9,7 @@ All credit for the app itself goes to the RadioDroid project. Licensed GPL-3.0 l
 
 <p align="center">
   <img src="docs/screenshots/stations.png" width="250" alt="Station list" />
-  <img src="docs/screenshots/player.png" width="250" alt="Player with codec line and -5s / Live controls" />
+  <img src="docs/screenshots/player.png" width="250" alt="Player with time-shift controls" />
   <img src="docs/screenshots/recordings.png" width="250" alt="Player with the Recordings tab" />
   <img src="docs/screenshots/favorite.png" width="250" alt="Player with a favourite station" />
 </p>
@@ -25,6 +25,9 @@ All credit for the app itself goes to the RadioDroid project. Licensed GPL-3.0 l
 - **Skip-back buffer setting** (Settings → Playback): 1, 2, 5 (default), 10 or 30 minutes, or Auto. Sized from the station's bitrate (128 kbps if unknown); large buffers are kept on disk in the app cache, and the summary shows the approximate storage.
 - **Lock-screen / media controls**: media notification with Back 5 s, Go live and Record actions.
 - **Lock-screen seek bar** (new in 1.0.4): see and drag through the rewind buffer right from the lock screen or notification; drag to the end to go live.
+
+  <img src="docs/screenshots/lockscreen-seekbar.png" width="520" alt="Lock screen player with the seek bar for the rewind buffer" />
+
 - **Scheduled recordings**: pick station, start time, duration, once or on repeat days.
 - **Silent recordings**: scheduled recordings can record without playing aloud or taking audio focus
   (per-schedule *Record silently* option, on by default; off keeps play-while-recording). There is also
@@ -45,6 +48,13 @@ All credit for the app itself goes to the RadioDroid project. Licensed GPL-3.0 l
   [#1222](https://github.com/segler-alex/RadioDroid/issues/1222) silent failure adding an alarm,
   [#349](https://github.com/segler-alex/RadioDroid/issues/349) stream format details.
 - **About screen** works again and shows this fork's info.
+
+## Themes
+Omarchy (Tokyo Night), Light, Dark, AMOLED Black, Gruvbox Dark, Catppuccin Mocha, Nord, Dracula, Enclave, Terminal and Vintage (Settings → Appearance → Theme).
+
+<p align="center">
+  <img src="docs/screenshots/theme-grid.png" width="800" alt="All 11 themes" />
+</p>
 
 ## Install
 Download `RadioArkiv.apk` from the [Releases](../../releases) page and sideload it (allow "install unknown apps").
