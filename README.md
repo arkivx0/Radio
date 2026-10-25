@@ -3,7 +3,7 @@
 **Radio Arkiv** (formerly "Radio") is an unofficial fork of [RadioDroid](https://github.com/segler-alex/RadioDroid)
 by segler-alex and contributors, an Android internet-radio app built on the free
 [Radio Browser](https://www.radio-browser.info) station directory.
-Current version: **1.0.0** (based on RadioDroid 0.86).
+Current version: **1.0.1** (based on RadioDroid 0.86).
 It installs alongside upstream (`applicationId io.github.arkivx0.radio`).
 All credit for the app itself goes to the RadioDroid project. Licensed GPL-3.0 like upstream.
 
@@ -26,11 +26,12 @@ All credit for the app itself goes to the RadioDroid project. Licensed GPL-3.0 l
 - **Scheduled recordings**: pick station, start time, duration, once or on repeat days.
 - **Silent recordings**: scheduled recordings can record without playing aloud or taking audio focus
   (per-schedule *Record silently* option, on by default; off keeps play-while-recording). There is also
-  *Record now silently*. Files go to `Music/Radio` like other recordings.
+  *Record now silently*. Files go to `Music/Radio` like other recordings. All recording options are in
+  Settings → Recordings.
 - **Open audio files with Radio Arkiv**: recordings (`Music/Radio`) and other audio files can be opened with Radio Arkiv
   and play in its player with seeking, pause/resume and lock-screen controls. In the recordings list, tap to
   play in Radio Arkiv, long-press to open with another app.
-- **Open file**: ⋮ → *Open audio file…* picks any audio file with the system file picker (no storage
+- **Open file**: the folder button in the toolbar (or ⋮ → *Open audio file…*, or the top row of the Recordings tab) picks any audio file with the system file picker (no storage
   permission needed) and plays it in Radio Arkiv.
 - **Codec info line**: the full player shows the decoded source format, e.g. `AAC-LC · 44.1 kHz · stereo`.
 - **Android 13/14 fixes**: recording without legacy storage permission, exact-alarm fallback,
@@ -52,8 +53,8 @@ Download `RadioArkiv.apk` from [Releases](../../releases). APKs are signed with 
 
 - Signing certificate SHA-256:
   `291e1bccf7a19a6d0542a0a4c1af02aef42d305216534d798a85dc4187254861`
-- APK SHA-256 for 1.0.0:
-  `82ffe65a11d56d786363f8c58b12194da17953855f330540c235f693c79e59cf`
+- APK SHA-256 for 1.0.1:
+  `cdcbcbd0d8d7c50eaa0f5ad8b15f7915f72dcb429a4ba3357be0d32af56de521`
 
 Verify before installing:
 ```
