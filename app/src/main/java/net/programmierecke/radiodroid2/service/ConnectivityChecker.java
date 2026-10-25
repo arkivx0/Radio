@@ -32,6 +32,8 @@ public class ConnectivityChecker {
 
     private ConnectionType lastConnectionType;
 
+    private Context appContext;
+
     public static ConnectionType getCurrentConnectionType(Context context) {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         return ConnectivityManagerCompat.isActiveNetworkMetered(connectivityManager) ? ConnectionType.METERED : ConnectionType.NOT_METERED;
@@ -44,20 +46,31 @@ public class ConnectivityChecker {
             return;
         }
 
+        appContext = context.getApplicationContext();
         lastConnectionType = getCurrentConnectionType(context);
 
         connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             networkCallback = new ConnectivityManager.NetworkCallback() {
+                // Only the default (active) network matters. Listening to every network made a
+                // metered mobile-data network trigger the warning even while playing over Wi-Fi.
                 @Override
                 public void onCapabilitiesChanged(Network network, NetworkCapabilities networkCapabilities) {
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+                        // registerNetworkCallback reports all networks; evaluate the active one.
+                        onConnectivityChanged(true, getCurrentConnectionType(appContext));
+                        return;
+                    }
                     boolean connected = networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
                     boolean metered = !networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED);
                     onConnectivityChanged(connected, metered ? ConnectionType.METERED : ConnectionType.NOT_METERED);
                 }
-                // -Snip-
             };
-            connectivityManager.registerNetworkCallback(new NetworkRequest.Builder().build(), networkCallback);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                connectivityManager.registerDefaultNetworkCallback(networkCallback);
+            } else {
+                connectivityManager.registerNetworkCallback(new NetworkRequest.Builder().build(), networkCallback);
+            }
         } else {
             networkBroadcastReceiver = new BroadcastReceiver() {
                 @Override
