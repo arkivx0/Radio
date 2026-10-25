@@ -18,7 +18,7 @@ All credit for the app itself goes to the RadioDroid project. Licensed GPL-3.0 l
 ## What this fork adds
 - **Incoming-call crash fix**: audio-focus loss (e.g. a call) no longer kills the service on Android 12+;
   playback pauses cleanly and resumes after the call.
-- **11 skins** with swatch previews in Settings → theme: Omarchy / Tokyo Night (default), AMOLED Black,
+- **11 skins** with swatch previews in Settings → Appearance → Theme: Omarchy / Tokyo Night (default), AMOLED Black,
   Gruvbox Dark, Catppuccin Mocha, Nord, Dracula, Enclave, Terminal (green phosphor), Vintage (tube radio),
   Light and Dark. Bundled OFL fonts: VT323 and Limelight.
 - **Time-shift**: skip back 5 s (repeatable), **long-press for Back 30 s**, and **Go live**, with a behind-live indicator.
