@@ -392,14 +392,29 @@ public class FragmentPlayerFull extends Fragment {
         stopUpdating();
     }
 
+    @Override
+    public void onDestroyView() {
+        stopUpdating();
+        super.onDestroyView();
+    }
+
     public void setTouchInterceptListener(TouchInterceptListener touchInterceptListener) {
         this.touchInterceptListener = touchInterceptListener;
     }
 
+    // Radio fork: isVisible() is false while the window is not attached yet (e.g. in onResume
+    // after the activity was recreated), which left the full player frozen on an old station.
+    private boolean updating = false;
+
     private void startUpdating() {
-        if (!isVisible()) {
+        if (getView() == null || isHidden() || !isAdded()) {
             return;
         }
+        if (updating) {
+            fullUpdate();
+            return;
+        }
+        updating = true;
 
         fullUpdate();
 
@@ -419,9 +434,10 @@ public class FragmentPlayerFull extends Fragment {
     }
 
     private void stopUpdating() {
-        if (getView() == null) {
+        if (getView() == null || !updating) {
             return;
         }
+        updating = false;
 
         refreshHandler.cancel();
 
@@ -875,6 +891,8 @@ public class FragmentPlayerFull extends Fragment {
         @Override
         protected void run(FragmentPlayerFull fragmentPlayerFull) {
             final ShoutcastInfo shoutcastInfo = PlayerServiceUtil.getShoutcastInfo();
+            // Keep the codec line in step with the current stream (cleared until it reports)
+            fragmentPlayerFull.updateSourceAudioInfo(shoutcastInfo);
 
             if (PlayerServiceUtil.isPlaying()) {
                 String networkUsageInfo = Utils.getReadableBytes(PlayerServiceUtil.getTransferredBytes());
