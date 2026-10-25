@@ -22,6 +22,7 @@ import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import java.util.List;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -916,8 +917,14 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
         RadioDroidApp radioDroidApp = (RadioDroidApp) getApplication();
         HistoryManager historyManager = radioDroidApp.getHistoryManager();
-        Fragment currentFragment = mFragmentManager.getFragments().get(mFragmentManager.getFragments().size() - 2);
-        if (historyManager.size() > 0 && currentFragment instanceof FragmentAlarm) {
+        if (historyManager.size() == 0) {
+            // Alarms use the most recently played station; tell the user instead of silently doing nothing.
+            Toast.makeText(this, R.string.alarm_no_station_selected, Toast.LENGTH_LONG).show();
+            return;
+        }
+        List<Fragment> fragments = mFragmentManager.getFragments();
+        Fragment currentFragment = fragments.size() >= 2 ? fragments.get(fragments.size() - 2) : null;
+        if (currentFragment instanceof FragmentAlarm) {
             DataRadioStation station = historyManager.getList().get(0);
             ((FragmentAlarm) currentFragment).getRam().add(station, hourOfDay, minute);
         }
