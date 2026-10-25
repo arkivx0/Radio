@@ -3,6 +3,7 @@
 **Radio Arkiv** (formerly "Radio") is an unofficial fork of [RadioDroid](https://github.com/segler-alex/RadioDroid)
 by segler-alex and contributors, an Android internet-radio app built on the free
 [Radio Browser](https://www.radio-browser.info) station directory.
+Current version: **1.0.0** (based on RadioDroid 0.86).
 It installs alongside upstream (`applicationId io.github.arkivx0.radio`).
 All credit for the app itself goes to the RadioDroid project. Licensed GPL-3.0 like upstream.
 
@@ -23,6 +24,9 @@ All credit for the app itself goes to the RadioDroid project. Licensed GPL-3.0 l
 - **Time-shift**: skip back 5 s (repeatable, up to ~5 min) and **Go live**, with a behind-live indicator.
 - **Lock-screen / media controls**: media notification with Back 5 s, Go live and Record actions.
 - **Scheduled recordings**: pick station, start time, duration, once or on repeat days.
+- **Silent recordings**: scheduled recordings can record without playing aloud or taking audio focus
+  (per-schedule *Record silently* option, on by default; off keeps play-while-recording). There is also
+  *Record now silently*. Files go to `Music/Radio` like other recordings.
 - **Open audio files with Radio Arkiv**: recordings (`Music/Radio`) and other audio files can be opened with Radio Arkiv
   and play in its player with seeking, pause/resume and lock-screen controls. In the recordings list, tap to
   play in Radio Arkiv, long-press to open with another app.
@@ -43,9 +47,24 @@ All credit for the app itself goes to the RadioDroid project. Licensed GPL-3.0 l
 Download `RadioArkiv.apk` from the [Releases](../../releases) page and sideload it (allow "install unknown apps").
 It does not replace RadioDroid. Builds are the `free` flavor (no proprietary services, no analytics).
 
+## Download & verify
+Download `RadioArkiv.apk` from [Releases](../../releases). APKs are signed with the Radio Arkiv release key.
+
+- Signing certificate SHA-256:
+  `291e1bccf7a19a6d0542a0a4c1af02aef42d305216534d798a85dc4187254861`
+- APK SHA-256 for 1.0.0:
+  `82ffe65a11d56d786363f8c58b12194da17953855f330540c235f693c79e59cf`
+
+Verify before installing:
+```
+sha256sum RadioArkiv.apk
+apksigner verify --print-certs RadioArkiv.apk   # "Signer #1 certificate SHA-256 digest" must match
+```
+Each release lists its own APK SHA-256; the certificate fingerprint stays the same for all updates.
+
 ## Known limits
 - HLS streams cannot be rewound (time-shift works for regular Icecast/Shoutcast streams).
-- Scheduled recordings play the stream aloud while recording and take audio focus.
+- Silent recording does not support HLS streams (turn *Record silently* off for those).
 - Time-shift positions are estimated from the stream bitrate; jumps can cause a short gap.
 
 ## Credits and license
