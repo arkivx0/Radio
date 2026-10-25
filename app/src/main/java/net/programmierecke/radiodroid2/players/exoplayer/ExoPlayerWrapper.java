@@ -163,6 +163,7 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
             timeShift = createTimeShift(dataSourceFactory, Uri.parse(streamUrl), prefs);
             timeShift.start();
             shiftMs = 0;
+            shifting = false;
             audioSource = new ProgressiveMediaSource.Factory(timeShift.readerFactory())
                     .setLoadErrorHandlingPolicy(new CustomLoadErrorHandlingPolicy())
                     .createMediaSource(MediaItem.fromUri(Uri.parse(streamUrl)));
@@ -267,19 +268,61 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
         if (!canTimeShift()) return;
         // Measure from what is actually heard: reader cursor behind live plus the player's own
         // read-ahead. Using only the last requested shift made Back 5s land near the live edge.
-        long heardBehind = timeShift.readerBehindMs() + Math.max(0, getBufferedMs());
-        long target = deltaMs == Long.MIN_VALUE ? 0 : Math.max(0, heardBehind + deltaMs);
-        target = Math.min(target, timeShift.maxBehindMs());
-        shiftMs = timeShift.seekBehind(target);
-        if (shiftMs < 1000) shiftMs = 0;
+        long played = Math.max(0, player.getCurrentPosition());
+        shiftMs = timeShift.shift(played, deltaMs);
+        Log.i(TimeShiftBuffer.LOG, "tap delta=" + deltaMs + " playerPositionMs=" + played
+                + " playerBufferedMs=" + (player.getBufferedPosition() - player.getCurrentPosition())
+                + " readerPos=" + timeShift.readerPos() + " written=" + timeShift.written()
+                + " newOffsetMs=" + shiftMs);
+        // A live progressive stream has no seek map, so ExoPlayer cannot seek inside it: the
+        // source is re-prepared and the time-shift reader starts at the new position. Keep the
+        // app in "Playing" meanwhile (no state flicker, elapsed time not reset).
+        shifting = true;
         player.stop();
         player.setMediaSource(audioSource);
         player.prepare();
         player.setPlayWhenReady(true);
     }
 
+    private boolean shifting;
+    private final java.util.ArrayDeque<Long> recoveries = new java.util.ArrayDeque<>();
+
+    /**
+     * A decoder/parser error on a time-shifted live stream: reopen the ring just past what was
+     * heard (on a frame boundary) instead of stopping. At most 5 times per minute.
+     */
+    private boolean tryRecoverTimeShift(PlaybackException error) {
+        if (!canTimeShift() || localFile) return false;
+        int code = error.errorCode;
+        boolean decodeOrParse = (code >= 3000 && code < 5000);
+        if (!decodeOrParse) return false;
+        long now = System.currentTimeMillis();
+        while (!recoveries.isEmpty() && now - recoveries.peekFirst() > 60_000) recoveries.removeFirst();
+        if (recoveries.size() >= 5) {
+            Log.w(TimeShiftBuffer.LOG, "too many decoder errors, giving up: " + error.getErrorCodeName());
+            return false;
+        }
+        recoveries.addLast(now);
+        Log.w(TimeShiftBuffer.LOG, "decoder/parser error " + error.getErrorCodeName() + ", recovering", error);
+        final long played = Math.max(0, player.getCurrentPosition());
+        playerThreadHandler.post(() -> {
+            if (!canTimeShift()) return;
+            shiftMs = timeShift.recover(played);
+            shifting = true;
+            player.stop();
+            player.setMediaSource(audioSource);
+            player.prepare();
+            player.setPlayWhenReady(true);
+        });
+        return true;
+    }
+
     public long getBehindLiveMs() {
-        return canTimeShift() ? shiftMs : 0;
+        if (!canTimeShift()) return 0;
+        // While re-preparing the player position restarts at 0; show the offset just set.
+        if (shifting) return shiftMs;
+        long behind = timeShift.behindLiveMs(Math.max(0, player.getCurrentPosition()));
+        return behind < 1000 ? 0 : behind;
     }
 
     @Override
@@ -326,6 +369,10 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
 
     @Override
     public long getBufferedMs() {
+        if (canTimeShift()) {
+            // Skip-back history behind what is heard (same model as the offset and the taps)
+            return timeShift.historyMs(Math.max(0, player.getCurrentPosition()));
+        }
         if (player != null) {
             return (int) (player.getBufferedPosition() - player.getCurrentPosition());
         }
@@ -467,6 +514,8 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
         int bitrateBitsPerSecond = format.averageBitrate > 0
                 ? format.averageBitrate
                 : format.bitrate;
+        // The decoder's bitrate is more reliable than the station directory's value
+        if (timeShift != null && bitrateBitsPerSecond > 0) timeShift.setBitrateKbps(bitrateBitsPerSecond / 1000);
 
         ShoutcastInfo publishedInfo;
         synchronized (streamInfoLock) {
@@ -555,6 +604,7 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
     @Override
     public void onPlayerErrorChanged(PlaybackException error) {
         Log.d(TAG, "Player error: ", error);
+        if (error != null && tryRecoverTimeShift(error)) return;
         // Stop playing since it is either irrecoverable error in the player or our data source failed to reconnect.
         if (fullStopTask != null) {
             stop();
@@ -622,6 +672,18 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
         @Override
         public void onPlayerStateChanged(EventTime eventTime, boolean playWhenReady, int playbackState) {
             isPlayingFlag = playbackState == Player.STATE_READY || playbackState == Player.STATE_BUFFERING;
+            if (playbackState == Player.STATE_READY && timeShift != null && player != null) {
+                timeShift.onPlaybackStarted(Math.max(0, player.getCurrentPosition()));
+            }
+            if (shifting) {
+                if (playbackState == Player.STATE_READY) {
+                    shifting = false;
+                    cancelStopTask();
+                    Log.i(TimeShiftBuffer.LOG, "re-prepared after shift, behind=" + shiftMs + " ms");
+                }
+                if (playbackState != Player.STATE_ENDED) return;
+                shifting = false;
+            }
 
             switch (playbackState) {
                 case Player.STATE_READY:

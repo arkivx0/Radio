@@ -58,4 +58,5 @@ public final class TimeShiftSettings {
         double mb = capacityFor(pref, kbps) / (1024.0 * 1024.0);
         return mb < 10 ? String.format(java.util.Locale.US, "%.1f MB", mb) : Math.round(mb) + " MB";
     }
+
 }

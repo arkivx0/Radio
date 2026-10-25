@@ -245,13 +245,20 @@ public class FragmentPlayerFull extends Fragment {
         btnNext = view.findViewById(R.id.buttonNext);
         btnRecord = view.findViewById(R.id.buttonRecord);
         textBehindLive = view.findViewById(R.id.textBehindLive);
-        view.findViewById(R.id.buttonBack5).setOnClickListener(v -> PlayerServiceUtil.shiftBy(5000));
+        view.findViewById(R.id.buttonBack5).setOnClickListener(v -> {
+            PlayerServiceUtil.shiftBy(5000);
+            afterShiftTap();
+        });
         view.findViewById(R.id.buttonBack5).setOnLongClickListener(v -> {
             PlayerServiceUtil.shiftBy(30000);
+            afterShiftTap();
             Toast.makeText(requireContext(), R.string.player_back_30s, Toast.LENGTH_SHORT).show();
             return true;
         });
-        view.findViewById(R.id.buttonGoLive).setOnClickListener(v -> PlayerServiceUtil.shiftBy(Long.MIN_VALUE));
+        view.findViewById(R.id.buttonGoLive).setOnClickListener(v -> {
+            PlayerServiceUtil.shiftBy(Long.MIN_VALUE);
+            afterShiftTap();
+        });
         btnFavourite = view.findViewById(R.id.buttonFavorite);
 
         historyAndRecordsPagerAdapter.recyclerViewSongHistory.setAdapter(trackHistoryAdapter);
@@ -417,6 +424,8 @@ public class FragmentPlayerFull extends Fragment {
         }
         if (updating) {
             fullUpdate();
+            // Re-arm the 1 s timer in case it was dropped (executePeriodically replaces it)
+            refreshHandler.executePeriodically(timedUpdateTask, TIMED_UPDATE_INTERVAL);
             return;
         }
         updating = true;
@@ -438,13 +447,34 @@ public class FragmentPlayerFull extends Fragment {
         favouriteManager.addObserver(favouritesObserver);
     }
 
+    static final String SKIP_LOG = "RadioArkivSkip";
+    private long lastTickMs;
+    private final android.os.Handler uiHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+
+    /** After a time-shift tap: check the 1 s timer is alive and refresh soon. */
+    private void afterShiftTap() {
+        long since = System.currentTimeMillis() - lastTickMs;
+        android.util.Log.i(SKIP_LOG, "ui tap: updating=" + updating + " hidden=" + isHidden()
+                + " lastTickAgoMs=" + since + " playing=" + PlayerServiceUtil.isPlaying()
+                + " state=" + PlayerServiceUtil.getPlayerState());
+        if (updating && since > 3 * TIMED_UPDATE_INTERVAL) {
+            android.util.Log.w(SKIP_LOG, "ui timer was stalled, restarting it");
+            refreshHandler.executePeriodically(timedUpdateTask, TIMED_UPDATE_INTERVAL);
+        } else if (!updating && getView() != null && !isHidden()) {
+            android.util.Log.w(SKIP_LOG, "ui was not updating while visible, starting");
+            startUpdating();
+        }
+        uiHandler.postDelayed(() -> { if (getView() != null) timedUpdateTask.run(); }, 300);
+        uiHandler.postDelayed(() -> { if (getView() != null) timedUpdateTask.run(); }, 1200);
+    }
+
     private void stopUpdating() {
+        refreshHandler.cancel();
         if (getView() == null || !updating) {
+            updating = false;
             return;
         }
         updating = false;
-
-        refreshHandler.cancel();
 
         if (trackMetadataCallback != null) {
             trackMetadataCallback.cancel();
@@ -895,8 +925,25 @@ public class FragmentPlayerFull extends Fragment {
             super(obj);
         }
 
+        private int ticks;
+
         @Override
         protected void run(FragmentPlayerFull fragmentPlayerFull) {
+            fragmentPlayerFull.lastTickMs = System.currentTimeMillis();
+            try {
+                tick(fragmentPlayerFull);
+            } catch (RuntimeException e) {
+                // Never let one bad tick kill the periodic refresh
+                android.util.Log.e(SKIP_LOG, "ui tick failed", e);
+            }
+            if (++ticks % 5 == 0) {
+                android.util.Log.d(SKIP_LOG, "ui tick playing=" + PlayerServiceUtil.isPlaying()
+                        + " behindMs=" + PlayerServiceUtil.getBehindLiveMs()
+                        + " bufferedS=" + PlayerServiceUtil.getBufferedSeconds());
+            }
+        }
+
+        private void tick(FragmentPlayerFull fragmentPlayerFull) {
             final ShoutcastInfo shoutcastInfo = PlayerServiceUtil.getShoutcastInfo();
             // Keep the codec line in step with the current stream (cleared until it reports)
             fragmentPlayerFull.updateSourceAudioInfo(shoutcastInfo);
