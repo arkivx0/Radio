@@ -20,7 +20,7 @@ public class FragmentAbout extends Fragment {
         TextView aTextVersion = (TextView) view.findViewById(R.id.about_version);
         if (aTextVersion != null) {
 
-            String version = BuildConfig.VERSION_NAME;
+            String version = getString(R.string.app_name) + " " + BuildConfig.VERSION_NAME;
             String gitHash = getString(R.string.GIT_HASH);
             String buildDate = getString(R.string.BUILD_DATE);
 
