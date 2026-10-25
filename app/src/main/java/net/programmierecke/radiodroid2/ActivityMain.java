@@ -93,6 +93,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
     public static final String EXTRA_SEARCH_TAG = "search_tag";
 
     public static final int LAUNCH_EQUALIZER_REQUEST = 1;
+    private static final int ACTION_OPEN_AUDIO_FILE = 4711;
 
     public final static int MAX_DYNAMIC_LAUNCHER_SHORTCUTS = 4;
 
@@ -755,6 +756,14 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
     protected void onActivityResult(int requestCode, int resultCode, Intent resultData) {
         super.onActivityResult(requestCode, resultCode, resultData);
 
+        if (requestCode == ACTION_OPEN_AUDIO_FILE) {
+            if (resultCode == RESULT_OK && resultData != null && resultData.getData() != null) {
+                // Same path as "Open with Radio": persistable grant, file name as title, local playback
+                handleOpenAudioIntent(new Intent(Intent.ACTION_VIEW, resultData.getData()));
+            }
+            return;
+        }
+
         if (requestCode == ACTION_SAVE_FILE && resultCode == RESULT_OK) {
             Uri uri = null;
             if (resultData != null) {
@@ -858,6 +867,20 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
             case android.R.id.home:
                 mDrawerLayout.openDrawer(GravityCompat.START);  // OPEN DRAWER
                 return true;
+            case R.id.action_open_file: {
+                // Radio fork: system file picker, no storage permission needed
+                Intent pick = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                pick.addCategory(Intent.CATEGORY_OPENABLE);
+                pick.setType("audio/*");
+                pick.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"audio/*", "application/ogg", "application/x-ogg"});
+                pick.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+                try {
+                    startActivityForResult(pick, ACTION_OPEN_AUDIO_FILE);
+                } catch (android.content.ActivityNotFoundException e) {
+                    Toast.makeText(this, R.string.error_no_file_picker, Toast.LENGTH_SHORT).show();
+                }
+                return true;
+            }
             case R.id.action_record_schedules:
                 startActivity(new Intent(this, net.programmierecke.radiodroid2.recording.ActivityRecordSchedules.class));
                 return true;

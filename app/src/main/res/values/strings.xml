@@ -358,4 +358,6 @@
     <string name="context_menu_delete">@string/action_delete</string>
     <string name="alarm_no_station_selected">Play a station first. New alarms use the most recently played station.</string>
     <string name="error_no_app_for_recording">No other app can open this recording.</string>
+    <string name="action_open_audio_file">Open audio file…</string>
+    <string name="error_no_file_picker">No file picker available.</string>
 </resources>
