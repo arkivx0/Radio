@@ -134,6 +134,20 @@ public class RadioPlayer implements PlayerWrapper.PlayListener, Recordable {
         playStationTask.execute();
     }
 
+    // Radio fork: live time-shift controls
+    public void shiftBy(final long deltaMs) {
+        playerThreadHandler.post(() -> {
+            if (currentPlayer instanceof net.programmierecke.radiodroid2.players.exoplayer.ExoPlayerWrapper)
+                ((net.programmierecke.radiodroid2.players.exoplayer.ExoPlayerWrapper) currentPlayer).shiftBy(deltaMs);
+        });
+    }
+
+    public long getBehindLiveMs() {
+        if (currentPlayer instanceof net.programmierecke.radiodroid2.players.exoplayer.ExoPlayerWrapper)
+            return ((net.programmierecke.radiodroid2.players.exoplayer.ExoPlayerWrapper) currentPlayer).getBehindLiveMs();
+        return 0;
+    }
+
     private void cancelStationLinkRetrieval() {
         if (playStationTask != null) {
             playStationTask.cancel(true);

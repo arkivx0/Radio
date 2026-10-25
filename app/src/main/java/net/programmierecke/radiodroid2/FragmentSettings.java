@@ -93,6 +93,7 @@ public class FragmentSettings extends PreferenceFragmentCompat implements Shared
     public void onCreatePreferences(Bundle bundle, String s) {
         setPreferencesFromResource(R.xml.preferences, s);
         refreshToolbar();
+        decorateSkinPicker();
         if (s == null) {
             refreshToplevelIcons();
             SearchPreference searchPreference = (SearchPreference) findPreference("searchPreference");
@@ -260,6 +261,31 @@ public class FragmentSettings extends PreferenceFragmentCompat implements Shared
                 ((RadioDroidApp) getActivity().getApplication()).getFavouriteManager().updateShortcuts();
             getActivity().recreate();
         }
+    }
+
+    // Radio fork: colour swatches (bg | surface | accent | text) in the skin picker
+    private void decorateSkinPicker() {
+        androidx.preference.ListPreference lp = findPreference("theme_name");
+        if (lp == null || lp.getEntries() == null) return;
+        CharSequence[] entries = lp.getEntries();
+        CharSequence[] out = new CharSequence[entries.length];
+        for (int i = 0; i < entries.length; i++) {
+            int[] cols = null;
+            for (int[] sk : Skins.ALL)
+                if (getString(sk[0]).contentEquals(entries[i])) cols = new int[]{sk[4], sk[5], sk[3], sk[6]};
+            if (cols == null) cols = entries[i].toString().equals(getString(R.string.theme_light))
+                    ? new int[]{0xFFFFFFFF, 0xFFEEEEEE, 0xFF1D6293, 0xFF000000}
+                    : new int[]{0xFF2C2C2E, 0xFF232325, 0xFF1D6293, 0xFFFFFFFF};
+            android.text.SpannableStringBuilder sb = new android.text.SpannableStringBuilder();
+            for (int c : cols) {
+                int st = sb.length();
+                sb.append("\u25A0");
+                sb.setSpan(new android.text.style.ForegroundColorSpan(c), st, sb.length(), 0);
+            }
+            sb.append("  ").append(entries[i]);
+            out[i] = sb;
+        }
+        lp.setEntries(out);
     }
 
     @Override

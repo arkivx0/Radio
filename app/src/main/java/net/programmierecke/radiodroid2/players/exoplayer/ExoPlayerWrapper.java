@@ -132,8 +132,13 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
 
         DataSource.Factory dataSourceFactory = new RadioDataSourceFactory(httpClient, bandwidthMeter, this, retryTimeout, retryDelay);
         // Produces Extractor instances for parsing the media data.
+        stopTimeShift();
         if (!isHls) {
-            audioSource = new ProgressiveMediaSource.Factory(dataSourceFactory)
+            // Radio fork: route progressive streams through the time-shift ring buffer
+            timeShift = new TimeShiftBuffer(dataSourceFactory, Uri.parse(streamUrl));
+            timeShift.start();
+            shiftMs = 0;
+            audioSource = new ProgressiveMediaSource.Factory(timeShift.readerFactory())
                     .setLoadErrorHandlingPolicy(new CustomLoadErrorHandlingPolicy())
                     .createMediaSource(MediaItem.fromUri(Uri.parse(streamUrl)));
             player.setMediaSource(audioSource);
@@ -153,9 +158,42 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
         // State changed will be called when audio session id is available.
     }
 
+    private TimeShiftBuffer timeShift;
+    private long shiftMs;
+
+    private void stopTimeShift() {
+        if (timeShift != null) {
+            timeShift.stop();
+            timeShift = null;
+        }
+        shiftMs = 0;
+    }
+
+    public boolean canTimeShift() {
+        return timeShift != null && player != null;
+    }
+
+    /** Move playback deltaMs further behind live (negative = towards live). Must run on player thread. */
+    public void shiftBy(long deltaMs) {
+        if (!canTimeShift()) return;
+        long target = deltaMs == Long.MIN_VALUE ? 0 : Math.max(0, shiftMs + deltaMs);
+        target = Math.min(target, timeShift.maxBehindMs());
+        shiftMs = timeShift.seekBehind(target);
+        if (shiftMs < 1000) shiftMs = 0;
+        player.stop();
+        player.setMediaSource(audioSource);
+        player.prepare();
+        player.setPlayWhenReady(true);
+    }
+
+    public long getBehindLiveMs() {
+        return canTimeShift() ? shiftMs : 0;
+    }
+
     @Override
     public void pause() {
         Log.i(TAG, "Pause. Stopping exoplayer.");
+        stopTimeShift();
 
         cancelStopTask();
 
@@ -170,6 +208,7 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
     @Override
     public void stop() {
         Log.i(TAG, "Stopping exoplayer.");
+        stopTimeShift();
 
         cancelStopTask();
 

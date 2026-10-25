@@ -278,7 +278,7 @@
 
     <string name="media_route_menu_title">GoogleCast</string>
     <string name="app_id">5A97BAE4</string>
-    <string name="app_name">睿卓</string>
+    <string name="app_name">Radio</string>
 
     <string name="settings_mpd">Music Player Daemon</string>
     <string name="settings_mpd_port">MPD 端口</string>
@@ -302,7 +302,7 @@
     <string name="settings_ignore_battery_optimization_summary_off">电池优化被激活，睿卓将无法在后台失去焦点后重获焦点。</string>
     <string name="settings_other">其它</string>
     <string name="settings_statistics">统计</string>
-    <string name="settings_about">关于睿卓 (RadioDroid)</string>
+    <string name="settings_about">关于睿卓 (Radio)</string>
 
     <string name="description_btn_skip_to_next">转到下一个</string>
     <string name="description_btn_skip_to_previous">转到上一个</string>

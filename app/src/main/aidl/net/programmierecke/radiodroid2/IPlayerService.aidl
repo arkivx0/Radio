@@ -37,6 +37,8 @@ long getLastPlayStartTime();
 boolean getIsHls();
 PauseReason getPauseReason();
 boolean isNotificationActive();
+void shiftBy(long deltaMs);
+long getBehindLiveMs();
 
 void enableMPD(String hostname, int port);
 void disableMPD();

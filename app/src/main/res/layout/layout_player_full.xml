@@ -219,6 +219,39 @@
         android:layout_height="1dp"
         android:background="?android:attr/dividerVertical" />
 
+    <LinearLayout
+        android:id="@+id/layoutTimeShift"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/buttonBack5"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="-5s"
+            app:icon="@drawable/ic_replay5_24dp" />
+
+        <TextView
+            android:id="@+id/textBehindLive"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:fontFamily="monospace"
+            android:text="LIVE" />
+
+        <Button
+            android:id="@+id/buttonGoLive"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="Live"
+            app:icon="@drawable/ic_golive_24dp" />
+    </LinearLayout>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layoutPlaybackControls"
         android:layout_width="match_parent"

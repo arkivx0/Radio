@@ -133,6 +133,7 @@ public class FragmentPlayerFull extends Fragment {
     private ImageButton btnPrev;
     private ImageButton btnNext;
     private ImageButton btnRecord;
+    private TextView textBehindLive;
     private ImageButton btnFavourite;
 
     @Override
@@ -239,6 +240,9 @@ public class FragmentPlayerFull extends Fragment {
         btnPrev = view.findViewById(R.id.buttonPrev);
         btnNext = view.findViewById(R.id.buttonNext);
         btnRecord = view.findViewById(R.id.buttonRecord);
+        textBehindLive = view.findViewById(R.id.textBehindLive);
+        view.findViewById(R.id.buttonBack5).setOnClickListener(v -> PlayerServiceUtil.shiftBy(5000));
+        view.findViewById(R.id.buttonGoLive).setOnClickListener(v -> PlayerServiceUtil.shiftBy(Long.MIN_VALUE));
         btnFavourite = view.findViewById(R.id.buttonFavorite);
 
         historyAndRecordsPagerAdapter.recyclerViewSongHistory.setAdapter(trackHistoryAdapter);
@@ -519,9 +523,13 @@ public class FragmentPlayerFull extends Fragment {
 
         if (recording) {
             btnRecord.setImageResource(R.drawable.ic_stop_recording);
+            android.util.TypedValue tvErr = new android.util.TypedValue();
+            requireContext().getTheme().resolveAttribute(com.google.android.material.R.attr.colorError, tvErr, true);
+            btnRecord.setColorFilter(tvErr.data);
             btnRecord.setContentDescription(getResources().getString(R.string.detail_stop));
         } else {
             btnRecord.setImageResource(R.drawable.ic_start_recording);
+            btnRecord.clearColorFilter();
 
             if (!storagePermissionsDenied) {
                 btnRecord.setContentDescription(getResources().getString(R.string.image_button_record));
@@ -850,6 +858,11 @@ public class FragmentPlayerFull extends Fragment {
                 fragmentPlayerFull.textViewTimeCached.setText(DateUtils.formatElapsedTime(PlayerServiceUtil.getBufferedSeconds()));
 
                 fragmentPlayerFull.updateRunningRecording();
+
+                long behind = PlayerServiceUtil.getBehindLiveMs();
+                fragmentPlayerFull.textBehindLive.setText(behind > 0
+                        ? String.format(java.util.Locale.US, "-%d:%02d", behind / 60000, (behind / 1000) % 60)
+                        : "LIVE");
             }
         }
     }

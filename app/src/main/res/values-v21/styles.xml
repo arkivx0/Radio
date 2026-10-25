@@ -9,6 +9,7 @@
     </style>
 
     <style name="MyMaterialTheme.Base" parent="Theme.MaterialComponents.Light">
+        <item name="actionBarPopupTheme">@style/ThemeOverlay.AppCompat.Light</item>
         <item name="windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
         <item name="dialogTheme">@style/DialogTheme</item>
@@ -55,6 +56,7 @@
     </style>
 
     <style name="MyMaterialTheme.Base.Dark" parent="Theme.MaterialComponents">
+        <item name="actionBarPopupTheme">@style/ThemeOverlay.AppCompat.Dark</item>
         <item name="windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
         <item name="dialogTheme">@style/DialogTheme.Dark</item>

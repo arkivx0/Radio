@@ -1,4 +1,5 @@
 package net.programmierecke.radiodroid2;
+import android.os.Build;
 
 import android.app.TimePickerDialog;
 import android.content.BroadcastReceiver;
@@ -149,6 +150,11 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
     private AlertDialog meteredConnectionAlertDialog;
 
     @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(Utils.wrapSkinFontScale(base));
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         Iconics.init(this);
 
@@ -160,6 +166,12 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
         }
         setTheme(Utils.getThemeResId(this));
         setContentView(R.layout.layout_main);
+
+        // Android 13+: media/lock-screen notification needs runtime permission
+        if (Build.VERSION.SDK_INT >= 33 && androidx.core.content.ContextCompat.checkSelfPermission(this,
+                "android.permission.POST_NOTIFICATIONS") != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            androidx.core.app.ActivityCompat.requestPermissions(this, new String[]{"android.permission.POST_NOTIFICATIONS"}, 4711);
+        }
 
         Log.d(TAG, "FilesDir: "+getFilesDir().getAbsolutePath());
         Log.d(TAG, "CacheDir: "+getCacheDir().getAbsolutePath());
@@ -183,6 +195,18 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
 
         final Toolbar myToolbar = findViewById(R.id.my_awesome_toolbar);
         setSupportActionBar(myToolbar);
+        android.graphics.Typeface headingFont = Utils.getSkinHeadingFont(this);
+        if (headingFont != null) {
+            com.google.android.material.appbar.CollapsingToolbarLayout ctl = findViewById(R.id.collapsible_toolbar);
+            if (ctl != null) {
+                ctl.setCollapsedTitleTypeface(headingFont);
+                ctl.setExpandedTitleTypeface(headingFont);
+            }
+            for (int i = 0; i < myToolbar.getChildCount(); i++) {
+                android.view.View c = myToolbar.getChildAt(i);
+                if (c instanceof android.widget.TextView) ((android.widget.TextView) c).setTypeface(headingFont);
+            }
+        }
 
         PlayerServiceUtil.startService(getApplicationContext());
 
@@ -794,6 +818,9 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
         switch (menuItem.getItemId()) {
             case android.R.id.home:
                 mDrawerLayout.openDrawer(GravityCompat.START);  // OPEN DRAWER
+                return true;
+            case R.id.action_record_schedules:
+                startActivity(new Intent(this, net.programmierecke.radiodroid2.recording.ActivityRecordSchedules.class));
                 return true;
             case R.id.action_save:
                 try {

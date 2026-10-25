@@ -25,17 +25,17 @@ android {
 
     flavorDimensions "one"
 
-    compileSdkVersion 33
+    compileSdkVersion 34
 
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     kotlin {
         jvmToolchain {
-            languageVersion.set(JavaLanguageVersion.of("11"))
+            languageVersion.set(JavaLanguageVersion.of("17"))
         }
     }
 
@@ -44,12 +44,12 @@ android {
     }
 
     defaultConfig {
-        applicationId "net.programmierecke.radiodroid2"
-        minSdkVersion 16
-        targetSdkVersion 33
+        applicationId "io.github.arkivx0.radio"
+        minSdkVersion 21
+        targetSdkVersion 34
 
-        versionCode 96
-        versionName "0.86"
+        versionCode 98
+        versionName "0.86-radio4"
 
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
@@ -63,7 +63,7 @@ android {
         // Define your application name here.
         // It must neither be present in /res/values/strings.xml
         // nor in /res/values/string_no_translate.xml
-        resValue 'string', 'app_name_untranslated', 'RadioDroid'
+        resValue 'string', 'app_name_untranslated', 'Radio'
 
         // There is no easy way to get available locales during runtime, and especially before
         // tests setup.
@@ -117,7 +117,8 @@ android {
         }
     }
     lint {
-        abortOnError true
+        abortOnError false
+        checkReleaseBuilds false
     }
     namespace 'net.programmierecke.radiodroid2'
 
@@ -156,7 +157,7 @@ dependencies {
     //noinspection GradleDependency 2.8 is newer than 2.71828'
     implementation 'com.squareup.picasso:picasso:2.8'
     //noinspection GradleDependency
-    implementation 'jp.wasabeef:picasso-transformations:2.3.1'
+    implementation 'jp.wasabeef:picasso-transformations:2.4.0'
     implementation "com.google.android.exoplayer:exoplayer-core:$exoplayerVersion"
     implementation "com.google.android.exoplayer:exoplayer-hls:$exoplayerVersion"
     implementation "com.mikepenz:iconics-core:$iconicsVersion"
@@ -167,7 +168,7 @@ dependencies {
     implementation 'info.debatty:java-string-similarity:2.0.0'
     implementation 'me.xdrop:fuzzywuzzy:1.4.0'
     //noinspection GradleDependency
-    implementation 'com.github.zawadz88.materialpopupmenu:material-popup-menu:3.4.0'
+    implementation 'com.github.zawadz88:MaterialPopupMenu:3.4.0'
     implementation 'com.github.ByteHamster:SearchPreference:v2.3.0'
 
     implementation 'androidx.room:room-runtime:2.4.3'

@@ -406,24 +406,75 @@ public class Utils {
 
     public static String getTheme(final Context context) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-        return sharedPref.getString("theme_name", context.getResources().getString(R.string.theme_light));
+        return sharedPref.getString("theme_name", context.getResources().getString(R.string.theme_omarchy));
     }
 
     public static int getThemeResId(final Context context) {
         String selectedTheme = getTheme(context);
         if (selectedTheme.equals(context.getResources().getString(R.string.theme_dark)))
             return R.style.MyMaterialTheme_Dark;
-        else
+        for (int[] sk : Skins.ALL)
+            if (selectedTheme.equals(context.getResources().getString(sk[0]))) return sk[1];
+        if (selectedTheme.equals(context.getResources().getString(R.string.theme_light)))
             return R.style.MyMaterialTheme;
+        return R.style.MyMaterialTheme_SkinOmarchy;
+    }
+
+    /** Accent colour of the current skin (used for the media notification), or 0. */
+    public static int getSkinAccent(final Context context) {
+        int t = getThemeResId(context);
+        for (int[] sk : Skins.ALL) if (sk[1] == t) return sk[3];
+        return 0;
+    }
+
+    /** Heading/station-name font for the current skin, or null. */
+    public static android.graphics.Typeface getSkinHeadingFont(final Context context) {
+        int t = getThemeResId(context);
+        try {
+            if (t == R.style.MyMaterialTheme_SkinEnclave || t == R.style.MyMaterialTheme_SkinTerminal)
+                return androidx.core.content.res.ResourcesCompat.getFont(context, R.font.vt323);
+            if (t == R.style.MyMaterialTheme_SkinVintage)
+                return androidx.core.content.res.ResourcesCompat.getFont(context, R.font.limelight);
+        } catch (Exception ignored) {
+        }
+        return null;
+    }
+
+    /** VT323 renders small; scale fonts for Terminal (whole app) via configuration. */
+    public static Context wrapSkinFontScale(Context base) {
+        try {
+            android.content.SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(base);
+            String th = sp.getString("theme_name", "");
+            if (th.equals(base.getString(R.string.theme_terminal))) {
+                android.content.res.Configuration cfg = new android.content.res.Configuration(base.getResources().getConfiguration());
+                cfg.fontScale = cfg.fontScale * 1.18f;
+                return base.createConfigurationContext(cfg);
+            }
+        } catch (Exception ignored) {
+        }
+        return base;
+    }
+
+    /** Glow colour for the active station (Vintage dial / Terminal phosphor), or 0. */
+    public static int getSkinGlow(final Context context) {
+        int t = getThemeResId(context);
+        if (t == R.style.MyMaterialTheme_SkinVintage) return 0xCCFFB347;
+        if (t == R.style.MyMaterialTheme_SkinTerminal) return 0xAA33FF66;
+        if (t == R.style.MyMaterialTheme_SkinEnclave) return 0x885F8FD6;
+        return 0;
     }
 
     public static boolean isDarkTheme(final Context context) {
-        return getThemeResId(context) == R.style.MyMaterialTheme_Dark;
+        return getThemeResId(context) != R.style.MyMaterialTheme;
     }
 
     public static int getTimePickerThemeResId(final Context context) {
         int theme;
-        if (getThemeResId(context) == R.style.MyMaterialTheme_Dark)
+        int t = getThemeResId(context);
+        theme = 0;
+        for (int[] sk : Skins.ALL) if (sk[1] == t) theme = sk[2];
+        if (theme != 0) {
+        } else if (t == R.style.MyMaterialTheme_Dark)
             theme = R.style.DialogTheme_Dark;
         else
             theme = R.style.DialogTheme;
@@ -441,6 +492,9 @@ public class Utils {
     };
 
     public static boolean verifyStoragePermissions(Activity activity, int request_id) {
+        // Android 11+: scoped storage, WRITE_EXTERNAL_STORAGE is never granted (API 33+) and not
+        // needed to create our own files in Music/.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) return true;
         // Check if we have write permission
         int permission = ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
@@ -458,6 +512,7 @@ public class Utils {
     }
 
     public static boolean verifyStoragePermissions(Fragment fragment, int request_id) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) return true;
         // Check if we have write permission
         int permission = ContextCompat.checkSelfPermission(fragment.requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
 

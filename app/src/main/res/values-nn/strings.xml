@@ -163,7 +163,7 @@
   <string name="action_mpd_connected">Kopla til tenar: %1$s</string>
   <string name="settings_other">Anna</string>
   <string name="settings_statistics">Statistikk</string>
-  <string name="settings_about">Om RadioDroid</string>
+  <string name="settings_about">Om Radio</string>
   <string-array name="weekdays">
     <item>S</item>
     <item>M</item>

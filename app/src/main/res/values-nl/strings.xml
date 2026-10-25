@@ -211,7 +211,7 @@
 
     <string name="settings_other">Overig</string>
     <string name="settings_statistics">Statistieken</string>
-    <string name="settings_about">Over RadioDroid</string>
+    <string name="settings_about">Over Radio</string>
 
     <string-array name="weekdays">
         <item>Z</item>

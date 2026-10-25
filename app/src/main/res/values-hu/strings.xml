@@ -203,7 +203,7 @@
 
     <string name="settings_other">Egyéb</string>
     <string name="settings_statistics">Statisztika</string>
-    <string name="settings_about">Az RadioDroid névjegye</string>
+    <string name="settings_about">Az Radio névjegye</string>
 
     <string-array name="weekdays">
         <item>V</item>

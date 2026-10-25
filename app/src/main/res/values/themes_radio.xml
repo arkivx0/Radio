@@ -1,0 +1,614 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Radio fork: generated dark skins -->
+<resources>
+    <color name="skin_omarchy_bg">#1a1b26</color>
+    <color name="skin_omarchy_bar">#16161e</color>
+    <color name="skin_omarchy_surface">#24283b</color>
+    <color name="skin_omarchy_fg">#c0caf5</color>
+    <color name="skin_omarchy_accent">#7aa2f7</color>
+    <color name="skin_omarchy_muted">#565f89</color>
+    <color name="skin_omarchy_accent2">#7dcfff</color>
+    <color name="skin_omarchy_danger">#f7768e</color>
+    <style name="MyMaterialTheme.SkinOmarchy" parent="MyMaterialTheme.Dark">
+        <item name="android:windowBackground">@color/skin_omarchy_bg</item>
+        <item name="android:itemBackground">@color/skin_omarchy_bg</item>
+        <item name="android:colorBackground">@color/skin_omarchy_bg</item>
+        <item name="colorSurface">@color/skin_omarchy_surface</item>
+        <item name="colorOnSurface">@color/skin_omarchy_fg</item>
+        <item name="colorPrimary">@color/skin_omarchy_bar</item>
+        <item name="colorPrimaryDark">@color/skin_omarchy_bar</item>
+        <item name="colorPrimaryVariant">@color/skin_omarchy_bar</item>
+        <item name="colorSecondary">@color/skin_omarchy_accent</item>
+        <item name="colorAccent">@color/skin_omarchy_accent</item>
+        <item name="colorAccentMy">@color/skin_omarchy_accent</item>
+        <item name="colorControlActivated">@color/skin_omarchy_accent</item>
+        <item name="colorControlNormal">@color/skin_omarchy_muted</item>
+        <item name="colorError">@color/skin_omarchy_danger</item>
+        <item name="android:textColorPrimary">@color/skin_omarchy_fg</item>
+        <item name="android:textColorSecondary">@color/skin_omarchy_muted</item>
+        <item name="android:textColorHint">@color/skin_omarchy_muted</item>
+        <item name="android:statusBarColor">@color/skin_omarchy_bar</item>
+        <item name="android:navigationBarColor">@color/skin_omarchy_bar</item>
+        <item name="android:fontFamily">monospace</item>
+        <item name="fontFamily">monospace</item>
+        <item name="colorPlayerBackground">@color/skin_omarchy_surface</item>
+        <item name="colorPlayerShadow">@color/skin_omarchy_bar</item>
+        <item name="tagBackgroundColor">@color/skin_omarchy_surface</item>
+        <item name="menuTextColorSelected">@color/skin_omarchy_accent</item>
+        <item name="menuTextColorDefault">@color/skin_omarchy_fg</item>
+        <item name="menuBottomTextColorSelected">@color/skin_omarchy_accent</item>
+        <item name="menuBottomTextColorDefault">@color/skin_omarchy_muted</item>
+        <item name="menuBottomBackgroundColor">@color/skin_omarchy_bar</item>
+        <item name="swipeDeleteIconColor">@color/skin_omarchy_bg</item>
+        <item name="swipeDeleteBackgroundColor">@color/skin_omarchy_danger</item>
+        <item name="colorTabUnderline">@color/skin_omarchy_accent</item>
+        <item name="iconsInItemBackgroundColor">@color/skin_omarchy_accent2</item>
+        <item name="dialogTheme">@style/DialogTheme.SkinOmarchy</item>
+        <item name="alertDialogTheme">@style/AlertTheme.SkinOmarchy</item>
+        <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme.SkinOmarchy</item>
+    </style>
+    <style name="DialogTheme.SkinOmarchy" parent="DialogTheme.Dark">
+        <item name="android:windowBackground">@color/skin_omarchy_surface</item>
+        <item name="colorAccent">@color/skin_omarchy_accent</item>
+        <item name="colorPrimary">@color/skin_omarchy_accent</item>
+        <item name="colorSecondary">@color/skin_omarchy_accent</item>
+        <item name="android:textColorPrimary">@color/skin_omarchy_fg</item>
+        <item name="android:fontFamily">monospace</item>
+    </style>
+    <style name="AlertTheme.SkinOmarchy" parent="AlertTheme.Dark">
+        <item name="android:windowBackground">@color/skin_omarchy_surface</item>
+        <item name="colorAccent">@color/skin_omarchy_accent</item>
+        <item name="android:textColorPrimary">@color/skin_omarchy_fg</item>
+        <item name="android:fontFamily">monospace</item>
+    </style>
+    <style name="BottomSheetDialogTheme.SkinOmarchy" parent="BottomSheetDialogTheme.Dark">
+        <item name="bottomSheetStyle">@style/BottomSheetTheme.SkinOmarchy</item>
+        <item name="colorAccent">@color/skin_omarchy_accent</item>
+    </style>
+    <style name="BottomSheetTheme.SkinOmarchy" parent="BottomSheetTheme.Dark">
+        <item name="android:background">@color/skin_omarchy_surface</item>
+    </style>
+    <color name="skin_amoled_bg">#000000</color>
+    <color name="skin_amoled_bar">#000000</color>
+    <color name="skin_amoled_surface">#121212</color>
+    <color name="skin_amoled_fg">#ffffff</color>
+    <color name="skin_amoled_accent">#4fc3f7</color>
+    <color name="skin_amoled_muted">#8a8a8a</color>
+    <color name="skin_amoled_accent2">#80deea</color>
+    <color name="skin_amoled_danger">#ff5252</color>
+    <style name="MyMaterialTheme.SkinAmoled" parent="MyMaterialTheme.Dark">
+        <item name="android:windowBackground">@color/skin_amoled_bg</item>
+        <item name="android:itemBackground">@color/skin_amoled_bg</item>
+        <item name="android:colorBackground">@color/skin_amoled_bg</item>
+        <item name="colorSurface">@color/skin_amoled_surface</item>
+        <item name="colorOnSurface">@color/skin_amoled_fg</item>
+        <item name="colorPrimary">@color/skin_amoled_bar</item>
+        <item name="colorPrimaryDark">@color/skin_amoled_bar</item>
+        <item name="colorPrimaryVariant">@color/skin_amoled_bar</item>
+        <item name="colorSecondary">@color/skin_amoled_accent</item>
+        <item name="colorAccent">@color/skin_amoled_accent</item>
+        <item name="colorAccentMy">@color/skin_amoled_accent</item>
+        <item name="colorControlActivated">@color/skin_amoled_accent</item>
+        <item name="colorControlNormal">@color/skin_amoled_muted</item>
+        <item name="colorError">@color/skin_amoled_danger</item>
+        <item name="android:textColorPrimary">@color/skin_amoled_fg</item>
+        <item name="android:textColorSecondary">@color/skin_amoled_muted</item>
+        <item name="android:textColorHint">@color/skin_amoled_muted</item>
+        <item name="android:statusBarColor">@color/skin_amoled_bar</item>
+        <item name="android:navigationBarColor">@color/skin_amoled_bar</item>
+        <item name="android:fontFamily">monospace</item>
+        <item name="fontFamily">monospace</item>
+        <item name="colorPlayerBackground">@color/skin_amoled_surface</item>
+        <item name="colorPlayerShadow">@color/skin_amoled_bar</item>
+        <item name="tagBackgroundColor">@color/skin_amoled_surface</item>
+        <item name="menuTextColorSelected">@color/skin_amoled_accent</item>
+        <item name="menuTextColorDefault">@color/skin_amoled_fg</item>
+        <item name="menuBottomTextColorSelected">@color/skin_amoled_accent</item>
+        <item name="menuBottomTextColorDefault">@color/skin_amoled_muted</item>
+        <item name="menuBottomBackgroundColor">@color/skin_amoled_bar</item>
+        <item name="swipeDeleteIconColor">@color/skin_amoled_bg</item>
+        <item name="swipeDeleteBackgroundColor">@color/skin_amoled_danger</item>
+        <item name="colorTabUnderline">@color/skin_amoled_accent</item>
+        <item name="iconsInItemBackgroundColor">@color/skin_amoled_accent2</item>
+        <item name="dialogTheme">@style/DialogTheme.SkinAmoled</item>
+        <item name="alertDialogTheme">@style/AlertTheme.SkinAmoled</item>
+        <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme.SkinAmoled</item>
+    </style>
+    <style name="DialogTheme.SkinAmoled" parent="DialogTheme.Dark">
+        <item name="android:windowBackground">@color/skin_amoled_surface</item>
+        <item name="colorAccent">@color/skin_amoled_accent</item>
+        <item name="colorPrimary">@color/skin_amoled_accent</item>
+        <item name="colorSecondary">@color/skin_amoled_accent</item>
+        <item name="android:textColorPrimary">@color/skin_amoled_fg</item>
+        <item name="android:fontFamily">monospace</item>
+    </style>
+    <style name="AlertTheme.SkinAmoled" parent="AlertTheme.Dark">
+        <item name="android:windowBackground">@color/skin_amoled_surface</item>
+        <item name="colorAccent">@color/skin_amoled_accent</item>
+        <item name="android:textColorPrimary">@color/skin_amoled_fg</item>
+        <item name="android:fontFamily">monospace</item>
+    </style>
+    <style name="BottomSheetDialogTheme.SkinAmoled" parent="BottomSheetDialogTheme.Dark">
+        <item name="bottomSheetStyle">@style/BottomSheetTheme.SkinAmoled</item>
+        <item name="colorAccent">@color/skin_amoled_accent</item>
+    </style>
+    <style name="BottomSheetTheme.SkinAmoled" parent="BottomSheetTheme.Dark">
+        <item name="android:background">@color/skin_amoled_surface</item>
+    </style>
+    <color name="skin_gruvbox_bg">#282828</color>
+    <color name="skin_gruvbox_bar">#1d2021</color>
+    <color name="skin_gruvbox_surface">#3c3836</color>
+    <color name="skin_gruvbox_fg">#ebdbb2</color>
+    <color name="skin_gruvbox_accent">#fabd2f</color>
+    <color name="skin_gruvbox_muted">#928374</color>
+    <color name="skin_gruvbox_accent2">#8ec07c</color>
+    <color name="skin_gruvbox_danger">#fb4934</color>
+    <style name="MyMaterialTheme.SkinGruvbox" parent="MyMaterialTheme.Dark">
+        <item name="android:windowBackground">@color/skin_gruvbox_bg</item>
+        <item name="android:itemBackground">@color/skin_gruvbox_bg</item>
+        <item name="android:colorBackground">@color/skin_gruvbox_bg</item>
+        <item name="colorSurface">@color/skin_gruvbox_surface</item>
+        <item name="colorOnSurface">@color/skin_gruvbox_fg</item>
+        <item name="colorPrimary">@color/skin_gruvbox_bar</item>
+        <item name="colorPrimaryDark">@color/skin_gruvbox_bar</item>
+        <item name="colorPrimaryVariant">@color/skin_gruvbox_bar</item>
+        <item name="colorSecondary">@color/skin_gruvbox_accent</item>
+        <item name="colorAccent">@color/skin_gruvbox_accent</item>
+        <item name="colorAccentMy">@color/skin_gruvbox_accent</item>
+        <item name="colorControlActivated">@color/skin_gruvbox_accent</item>
+        <item name="colorControlNormal">@color/skin_gruvbox_muted</item>
+        <item name="colorError">@color/skin_gruvbox_danger</item>
+        <item name="android:textColorPrimary">@color/skin_gruvbox_fg</item>
+        <item name="android:textColorSecondary">@color/skin_gruvbox_muted</item>
+        <item name="android:textColorHint">@color/skin_gruvbox_muted</item>
+        <item name="android:statusBarColor">@color/skin_gruvbox_bar</item>
+        <item name="android:navigationBarColor">@color/skin_gruvbox_bar</item>
+        <item name="android:fontFamily">monospace</item>
+        <item name="fontFamily">monospace</item>
+        <item name="colorPlayerBackground">@color/skin_gruvbox_surface</item>
+        <item name="colorPlayerShadow">@color/skin_gruvbox_bar</item>
+        <item name="tagBackgroundColor">@color/skin_gruvbox_surface</item>
+        <item name="menuTextColorSelected">@color/skin_gruvbox_accent</item>
+        <item name="menuTextColorDefault">@color/skin_gruvbox_fg</item>
+        <item name="menuBottomTextColorSelected">@color/skin_gruvbox_accent</item>
+        <item name="menuBottomTextColorDefault">@color/skin_gruvbox_muted</item>
+        <item name="menuBottomBackgroundColor">@color/skin_gruvbox_bar</item>
+        <item name="swipeDeleteIconColor">@color/skin_gruvbox_bg</item>
+        <item name="swipeDeleteBackgroundColor">@color/skin_gruvbox_danger</item>
+        <item name="colorTabUnderline">@color/skin_gruvbox_accent</item>
+        <item name="iconsInItemBackgroundColor">@color/skin_gruvbox_accent2</item>
+        <item name="dialogTheme">@style/DialogTheme.SkinGruvbox</item>
+        <item name="alertDialogTheme">@style/AlertTheme.SkinGruvbox</item>
+        <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme.SkinGruvbox</item>
+    </style>
+    <style name="DialogTheme.SkinGruvbox" parent="DialogTheme.Dark">
+        <item name="android:windowBackground">@color/skin_gruvbox_surface</item>
+        <item name="colorAccent">@color/skin_gruvbox_accent</item>
+        <item name="colorPrimary">@color/skin_gruvbox_accent</item>
+        <item name="colorSecondary">@color/skin_gruvbox_accent</item>
+        <item name="android:textColorPrimary">@color/skin_gruvbox_fg</item>
+        <item name="android:fontFamily">monospace</item>
+    </style>
+    <style name="AlertTheme.SkinGruvbox" parent="AlertTheme.Dark">
+        <item name="android:windowBackground">@color/skin_gruvbox_surface</item>
+        <item name="colorAccent">@color/skin_gruvbox_accent</item>
+        <item name="android:textColorPrimary">@color/skin_gruvbox_fg</item>
+        <item name="android:fontFamily">monospace</item>
+    </style>
+    <style name="BottomSheetDialogTheme.SkinGruvbox" parent="BottomSheetDialogTheme.Dark">
+        <item name="bottomSheetStyle">@style/BottomSheetTheme.SkinGruvbox</item>
+        <item name="colorAccent">@color/skin_gruvbox_accent</item>
+    </style>
+    <style name="BottomSheetTheme.SkinGruvbox" parent="BottomSheetTheme.Dark">
+        <item name="android:background">@color/skin_gruvbox_surface</item>
+    </style>
+    <color name="skin_catppuccin_bg">#1e1e2e</color>
+    <color name="skin_catppuccin_bar">#181825</color>
+    <color name="skin_catppuccin_surface">#313244</color>
+    <color name="skin_catppuccin_fg">#cdd6f4</color>
+    <color name="skin_catppuccin_accent">#cba6f7</color>
+    <color name="skin_catppuccin_muted">#6c7086</color>
+    <color name="skin_catppuccin_accent2">#89dceb</color>
+    <color name="skin_catppuccin_danger">#f38ba8</color>
+    <style name="MyMaterialTheme.SkinCatppuccin" parent="MyMaterialTheme.Dark">
+        <item name="android:windowBackground">@color/skin_catppuccin_bg</item>
+        <item name="android:itemBackground">@color/skin_catppuccin_bg</item>
+        <item name="android:colorBackground">@color/skin_catppuccin_bg</item>
+        <item name="colorSurface">@color/skin_catppuccin_surface</item>
+        <item name="colorOnSurface">@color/skin_catppuccin_fg</item>
+        <item name="colorPrimary">@color/skin_catppuccin_bar</item>
+        <item name="colorPrimaryDark">@color/skin_catppuccin_bar</item>
+        <item name="colorPrimaryVariant">@color/skin_catppuccin_bar</item>
+        <item name="colorSecondary">@color/skin_catppuccin_accent</item>
+        <item name="colorAccent">@color/skin_catppuccin_accent</item>
+        <item name="colorAccentMy">@color/skin_catppuccin_accent</item>
+        <item name="colorControlActivated">@color/skin_catppuccin_accent</item>
+        <item name="colorControlNormal">@color/skin_catppuccin_muted</item>
+        <item name="colorError">@color/skin_catppuccin_danger</item>
+        <item name="android:textColorPrimary">@color/skin_catppuccin_fg</item>
+        <item name="android:textColorSecondary">@color/skin_catppuccin_muted</item>
+        <item name="android:textColorHint">@color/skin_catppuccin_muted</item>
+        <item name="android:statusBarColor">@color/skin_catppuccin_bar</item>
+        <item name="android:navigationBarColor">@color/skin_catppuccin_bar</item>
+        <item name="android:fontFamily">monospace</item>
+        <item name="fontFamily">monospace</item>
+        <item name="colorPlayerBackground">@color/skin_catppuccin_surface</item>
+        <item name="colorPlayerShadow">@color/skin_catppuccin_bar</item>
+        <item name="tagBackgroundColor">@color/skin_catppuccin_surface</item>
+        <item name="menuTextColorSelected">@color/skin_catppuccin_accent</item>
+        <item name="menuTextColorDefault">@color/skin_catppuccin_fg</item>
+        <item name="menuBottomTextColorSelected">@color/skin_catppuccin_accent</item>
+        <item name="menuBottomTextColorDefault">@color/skin_catppuccin_muted</item>
+        <item name="menuBottomBackgroundColor">@color/skin_catppuccin_bar</item>
+        <item name="swipeDeleteIconColor">@color/skin_catppuccin_bg</item>
+        <item name="swipeDeleteBackgroundColor">@color/skin_catppuccin_danger</item>
+        <item name="colorTabUnderline">@color/skin_catppuccin_accent</item>
+        <item name="iconsInItemBackgroundColor">@color/skin_catppuccin_accent2</item>
+        <item name="dialogTheme">@style/DialogTheme.SkinCatppuccin</item>
+        <item name="alertDialogTheme">@style/AlertTheme.SkinCatppuccin</item>
+        <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme.SkinCatppuccin</item>
+    </style>
+    <style name="DialogTheme.SkinCatppuccin" parent="DialogTheme.Dark">
+        <item name="android:windowBackground">@color/skin_catppuccin_surface</item>
+        <item name="colorAccent">@color/skin_catppuccin_accent</item>
+        <item name="colorPrimary">@color/skin_catppuccin_accent</item>
+        <item name="colorSecondary">@color/skin_catppuccin_accent</item>
+        <item name="android:textColorPrimary">@color/skin_catppuccin_fg</item>
+        <item name="android:fontFamily">monospace</item>
+    </style>
+    <style name="AlertTheme.SkinCatppuccin" parent="AlertTheme.Dark">
+        <item name="android:windowBackground">@color/skin_catppuccin_surface</item>
+        <item name="colorAccent">@color/skin_catppuccin_accent</item>
+        <item name="android:textColorPrimary">@color/skin_catppuccin_fg</item>
+        <item name="android:fontFamily">monospace</item>
+    </style>
+    <style name="BottomSheetDialogTheme.SkinCatppuccin" parent="BottomSheetDialogTheme.Dark">
+        <item name="bottomSheetStyle">@style/BottomSheetTheme.SkinCatppuccin</item>
+        <item name="colorAccent">@color/skin_catppuccin_accent</item>
+    </style>
+    <style name="BottomSheetTheme.SkinCatppuccin" parent="BottomSheetTheme.Dark">
+        <item name="android:background">@color/skin_catppuccin_surface</item>
+    </style>
+    <color name="skin_nord_bg">#2e3440</color>
+    <color name="skin_nord_bar">#272c36</color>
+    <color name="skin_nord_surface">#3b4252</color>
+    <color name="skin_nord_fg">#eceff4</color>
+    <color name="skin_nord_accent">#88c0d0</color>
+    <color name="skin_nord_muted">#616e88</color>
+    <color name="skin_nord_accent2">#81a1c1</color>
+    <color name="skin_nord_danger">#bf616a</color>
+    <style name="MyMaterialTheme.SkinNord" parent="MyMaterialTheme.Dark">
+        <item name="android:windowBackground">@color/skin_nord_bg</item>
+        <item name="android:itemBackground">@color/skin_nord_bg</item>
+        <item name="android:colorBackground">@color/skin_nord_bg</item>
+        <item name="colorSurface">@color/skin_nord_surface</item>
+        <item name="colorOnSurface">@color/skin_nord_fg</item>
+        <item name="colorPrimary">@color/skin_nord_bar</item>
+        <item name="colorPrimaryDark">@color/skin_nord_bar</item>
+        <item name="colorPrimaryVariant">@color/skin_nord_bar</item>
+        <item name="colorSecondary">@color/skin_nord_accent</item>
+        <item name="colorAccent">@color/skin_nord_accent</item>
+        <item name="colorAccentMy">@color/skin_nord_accent</item>
+        <item name="colorControlActivated">@color/skin_nord_accent</item>
+        <item name="colorControlNormal">@color/skin_nord_muted</item>
+        <item name="colorError">@color/skin_nord_danger</item>
+        <item name="android:textColorPrimary">@color/skin_nord_fg</item>
+        <item name="android:textColorSecondary">@color/skin_nord_muted</item>
+        <item name="android:textColorHint">@color/skin_nord_muted</item>
+        <item name="android:statusBarColor">@color/skin_nord_bar</item>
+        <item name="android:navigationBarColor">@color/skin_nord_bar</item>
+        <item name="android:fontFamily">monospace</item>
+        <item name="fontFamily">monospace</item>
+        <item name="colorPlayerBackground">@color/skin_nord_surface</item>
+        <item name="colorPlayerShadow">@color/skin_nord_bar</item>
+        <item name="tagBackgroundColor">@color/skin_nord_surface</item>
+        <item name="menuTextColorSelected">@color/skin_nord_accent</item>
+        <item name="menuTextColorDefault">@color/skin_nord_fg</item>
+        <item name="menuBottomTextColorSelected">@color/skin_nord_accent</item>
+        <item name="menuBottomTextColorDefault">@color/skin_nord_muted</item>
+        <item name="menuBottomBackgroundColor">@color/skin_nord_bar</item>
+        <item name="swipeDeleteIconColor">@color/skin_nord_bg</item>
+        <item name="swipeDeleteBackgroundColor">@color/skin_nord_danger</item>
+        <item name="colorTabUnderline">@color/skin_nord_accent</item>
+        <item name="iconsInItemBackgroundColor">@color/skin_nord_accent2</item>
+        <item name="dialogTheme">@style/DialogTheme.SkinNord</item>
+        <item name="alertDialogTheme">@style/AlertTheme.SkinNord</item>
+        <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme.SkinNord</item>
+    </style>
+    <style name="DialogTheme.SkinNord" parent="DialogTheme.Dark">
+        <item name="android:windowBackground">@color/skin_nord_surface</item>
+        <item name="colorAccent">@color/skin_nord_accent</item>
+        <item name="colorPrimary">@color/skin_nord_accent</item>
+        <item name="colorSecondary">@color/skin_nord_accent</item>
+        <item name="android:textColorPrimary">@color/skin_nord_fg</item>
+        <item name="android:fontFamily">monospace</item>
+    </style>
+    <style name="AlertTheme.SkinNord" parent="AlertTheme.Dark">
+        <item name="android:windowBackground">@color/skin_nord_surface</item>
+        <item name="colorAccent">@color/skin_nord_accent</item>
+        <item name="android:textColorPrimary">@color/skin_nord_fg</item>
+        <item name="android:fontFamily">monospace</item>
+    </style>
+    <style name="BottomSheetDialogTheme.SkinNord" parent="BottomSheetDialogTheme.Dark">
+        <item name="bottomSheetStyle">@style/BottomSheetTheme.SkinNord</item>
+        <item name="colorAccent">@color/skin_nord_accent</item>
+    </style>
+    <style name="BottomSheetTheme.SkinNord" parent="BottomSheetTheme.Dark">
+        <item name="android:background">@color/skin_nord_surface</item>
+    </style>
+    <color name="skin_dracula_bg">#282a36</color>
+    <color name="skin_dracula_bar">#21222c</color>
+    <color name="skin_dracula_surface">#44475a</color>
+    <color name="skin_dracula_fg">#f8f8f2</color>
+    <color name="skin_dracula_accent">#bd93f9</color>
+    <color name="skin_dracula_muted">#6272a4</color>
+    <color name="skin_dracula_accent2">#8be9fd</color>
+    <color name="skin_dracula_danger">#ff5555</color>
+    <style name="MyMaterialTheme.SkinDracula" parent="MyMaterialTheme.Dark">
+        <item name="android:windowBackground">@color/skin_dracula_bg</item>
+        <item name="android:itemBackground">@color/skin_dracula_bg</item>
+        <item name="android:colorBackground">@color/skin_dracula_bg</item>
+        <item name="colorSurface">@color/skin_dracula_surface</item>
+        <item name="colorOnSurface">@color/skin_dracula_fg</item>
+        <item name="colorPrimary">@color/skin_dracula_bar</item>
+        <item name="colorPrimaryDark">@color/skin_dracula_bar</item>
+        <item name="colorPrimaryVariant">@color/skin_dracula_bar</item>
+        <item name="colorSecondary">@color/skin_dracula_accent</item>
+        <item name="colorAccent">@color/skin_dracula_accent</item>
+        <item name="colorAccentMy">@color/skin_dracula_accent</item>
+        <item name="colorControlActivated">@color/skin_dracula_accent</item>
+        <item name="colorControlNormal">@color/skin_dracula_muted</item>
+        <item name="colorError">@color/skin_dracula_danger</item>
+        <item name="android:textColorPrimary">@color/skin_dracula_fg</item>
+        <item name="android:textColorSecondary">@color/skin_dracula_muted</item>
+        <item name="android:textColorHint">@color/skin_dracula_muted</item>
+        <item name="android:statusBarColor">@color/skin_dracula_bar</item>
+        <item name="android:navigationBarColor">@color/skin_dracula_bar</item>
+        <item name="android:fontFamily">monospace</item>
+        <item name="fontFamily">monospace</item>
+        <item name="colorPlayerBackground">@color/skin_dracula_surface</item>
+        <item name="colorPlayerShadow">@color/skin_dracula_bar</item>
+        <item name="tagBackgroundColor">@color/skin_dracula_surface</item>
+        <item name="menuTextColorSelected">@color/skin_dracula_accent</item>
+        <item name="menuTextColorDefault">@color/skin_dracula_fg</item>
+        <item name="menuBottomTextColorSelected">@color/skin_dracula_accent</item>
+        <item name="menuBottomTextColorDefault">@color/skin_dracula_muted</item>
+        <item name="menuBottomBackgroundColor">@color/skin_dracula_bar</item>
+        <item name="swipeDeleteIconColor">@color/skin_dracula_bg</item>
+        <item name="swipeDeleteBackgroundColor">@color/skin_dracula_danger</item>
+        <item name="colorTabUnderline">@color/skin_dracula_accent</item>
+        <item name="iconsInItemBackgroundColor">@color/skin_dracula_accent2</item>
+        <item name="dialogTheme">@style/DialogTheme.SkinDracula</item>
+        <item name="alertDialogTheme">@style/AlertTheme.SkinDracula</item>
+        <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme.SkinDracula</item>
+    </style>
+    <style name="DialogTheme.SkinDracula" parent="DialogTheme.Dark">
+        <item name="android:windowBackground">@color/skin_dracula_surface</item>
+        <item name="colorAccent">@color/skin_dracula_accent</item>
+        <item name="colorPrimary">@color/skin_dracula_accent</item>
+        <item name="colorSecondary">@color/skin_dracula_accent</item>
+        <item name="android:textColorPrimary">@color/skin_dracula_fg</item>
+        <item name="android:fontFamily">monospace</item>
+    </style>
+    <style name="AlertTheme.SkinDracula" parent="AlertTheme.Dark">
+        <item name="android:windowBackground">@color/skin_dracula_surface</item>
+        <item name="colorAccent">@color/skin_dracula_accent</item>
+        <item name="android:textColorPrimary">@color/skin_dracula_fg</item>
+        <item name="android:fontFamily">monospace</item>
+    </style>
+    <style name="BottomSheetDialogTheme.SkinDracula" parent="BottomSheetDialogTheme.Dark">
+        <item name="bottomSheetStyle">@style/BottomSheetTheme.SkinDracula</item>
+        <item name="colorAccent">@color/skin_dracula_accent</item>
+    </style>
+    <style name="BottomSheetTheme.SkinDracula" parent="BottomSheetTheme.Dark">
+        <item name="android:background">@color/skin_dracula_surface</item>
+    </style>
+    <color name="skin_enclave_bg">#0b0f1a</color>
+    <color name="skin_enclave_bar">#070a12</color>
+    <color name="skin_enclave_surface">#121a2b</color>
+    <color name="skin_enclave_fg">#d6e2f0</color>
+    <color name="skin_enclave_accent">#5f8fd6</color>
+    <color name="skin_enclave_muted">#4a5a73</color>
+    <color name="skin_enclave_accent2">#5f8fd6</color>
+    <color name="skin_enclave_danger">#c0392b</color>
+    <style name="MyMaterialTheme.SkinEnclave" parent="MyMaterialTheme.Dark">
+        <item name="android:windowBackground">@color/skin_enclave_bg</item>
+        <item name="android:itemBackground">@color/skin_enclave_bg</item>
+        <item name="android:colorBackground">@color/skin_enclave_bg</item>
+        <item name="colorSurface">@color/skin_enclave_surface</item>
+        <item name="colorOnSurface">@color/skin_enclave_fg</item>
+        <item name="colorPrimary">@color/skin_enclave_bar</item>
+        <item name="colorPrimaryDark">@color/skin_enclave_bar</item>
+        <item name="colorPrimaryVariant">@color/skin_enclave_bar</item>
+        <item name="colorSecondary">@color/skin_enclave_accent</item>
+        <item name="colorAccent">@color/skin_enclave_accent</item>
+        <item name="colorAccentMy">@color/skin_enclave_accent</item>
+        <item name="colorControlActivated">@color/skin_enclave_accent</item>
+        <item name="colorControlNormal">@color/skin_enclave_muted</item>
+        <item name="colorError">@color/skin_enclave_danger</item>
+        <item name="android:textColorPrimary">@color/skin_enclave_fg</item>
+        <item name="android:textColorSecondary">@color/skin_enclave_muted</item>
+        <item name="android:textColorHint">@color/skin_enclave_muted</item>
+        <item name="android:statusBarColor">@color/skin_enclave_bar</item>
+        <item name="android:navigationBarColor">@color/skin_enclave_bar</item>
+        <item name="android:fontFamily">monospace</item>
+        <item name="fontFamily">monospace</item>
+        <item name="colorPlayerBackground">@color/skin_enclave_surface</item>
+        <item name="colorPlayerShadow">@color/skin_enclave_bar</item>
+        <item name="tagBackgroundColor">@color/skin_enclave_surface</item>
+        <item name="menuTextColorSelected">@color/skin_enclave_accent</item>
+        <item name="menuTextColorDefault">@color/skin_enclave_fg</item>
+        <item name="menuBottomTextColorSelected">@color/skin_enclave_accent</item>
+        <item name="menuBottomTextColorDefault">@color/skin_enclave_muted</item>
+        <item name="menuBottomBackgroundColor">@color/skin_enclave_bar</item>
+        <item name="swipeDeleteIconColor">@color/skin_enclave_bg</item>
+        <item name="swipeDeleteBackgroundColor">@color/skin_enclave_danger</item>
+        <item name="colorTabUnderline">@color/skin_enclave_accent</item>
+        <item name="iconsInItemBackgroundColor">@color/skin_enclave_accent2</item>
+        <item name="dialogTheme">@style/DialogTheme.SkinEnclave</item>
+        <item name="alertDialogTheme">@style/AlertTheme.SkinEnclave</item>
+        <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme.SkinEnclave</item>
+    </style>
+    <style name="DialogTheme.SkinEnclave" parent="DialogTheme.Dark">
+        <item name="android:windowBackground">@color/skin_enclave_surface</item>
+        <item name="colorAccent">@color/skin_enclave_accent</item>
+        <item name="colorPrimary">@color/skin_enclave_accent</item>
+        <item name="colorSecondary">@color/skin_enclave_accent</item>
+        <item name="android:textColorPrimary">@color/skin_enclave_fg</item>
+        <item name="android:fontFamily">monospace</item>
+    </style>
+    <style name="AlertTheme.SkinEnclave" parent="AlertTheme.Dark">
+        <item name="android:windowBackground">@color/skin_enclave_surface</item>
+        <item name="colorAccent">@color/skin_enclave_accent</item>
+        <item name="android:textColorPrimary">@color/skin_enclave_fg</item>
+        <item name="android:fontFamily">monospace</item>
+    </style>
+    <style name="BottomSheetDialogTheme.SkinEnclave" parent="BottomSheetDialogTheme.Dark">
+        <item name="bottomSheetStyle">@style/BottomSheetTheme.SkinEnclave</item>
+        <item name="colorAccent">@color/skin_enclave_accent</item>
+    </style>
+    <style name="BottomSheetTheme.SkinEnclave" parent="BottomSheetTheme.Dark">
+        <item name="android:background">@color/skin_enclave_surface</item>
+    </style>
+    <color name="skin_terminal_bg">#020a04</color>
+    <color name="skin_terminal_bar">#010603</color>
+    <color name="skin_terminal_surface">#06140a</color>
+    <color name="skin_terminal_fg">#33ff66</color>
+    <color name="skin_terminal_accent">#7dff9a</color>
+    <color name="skin_terminal_muted">#1a7a33</color>
+    <color name="skin_terminal_accent2">#7dff9a</color>
+    <color name="skin_terminal_danger">#ffb000</color>
+    <style name="MyMaterialTheme.SkinTerminal" parent="MyMaterialTheme.Dark">
+        <item name="android:typeface">monospace</item>
+        <item name="android:windowBackground">@color/skin_terminal_bg</item>
+        <item name="android:itemBackground">@color/skin_terminal_bg</item>
+        <item name="android:colorBackground">@color/skin_terminal_bg</item>
+        <item name="colorSurface">@color/skin_terminal_surface</item>
+        <item name="colorOnSurface">@color/skin_terminal_fg</item>
+        <item name="colorPrimary">@color/skin_terminal_bar</item>
+        <item name="colorPrimaryDark">@color/skin_terminal_bar</item>
+        <item name="colorPrimaryVariant">@color/skin_terminal_bar</item>
+        <item name="colorSecondary">@color/skin_terminal_accent</item>
+        <item name="colorAccent">@color/skin_terminal_accent</item>
+        <item name="colorAccentMy">@color/skin_terminal_accent</item>
+        <item name="colorControlActivated">@color/skin_terminal_accent</item>
+        <item name="colorControlNormal">@color/skin_terminal_muted</item>
+        <item name="colorError">@color/skin_terminal_danger</item>
+        <item name="android:textColorPrimary">@color/skin_terminal_fg</item>
+        <item name="android:textColorSecondary">@color/skin_terminal_muted</item>
+        <item name="android:textColorHint">@color/skin_terminal_muted</item>
+        <item name="android:statusBarColor">@color/skin_terminal_bar</item>
+        <item name="android:navigationBarColor">@color/skin_terminal_bar</item>
+        <item name="android:fontFamily">@font/vt323</item>
+        <item name="fontFamily">@font/vt323</item>
+        <item name="colorPlayerBackground">@color/skin_terminal_surface</item>
+        <item name="colorPlayerShadow">@color/skin_terminal_bar</item>
+        <item name="tagBackgroundColor">@color/skin_terminal_surface</item>
+        <item name="menuTextColorSelected">@color/skin_terminal_accent</item>
+        <item name="menuTextColorDefault">@color/skin_terminal_fg</item>
+        <item name="menuBottomTextColorSelected">@color/skin_terminal_accent</item>
+        <item name="menuBottomTextColorDefault">@color/skin_terminal_muted</item>
+        <item name="menuBottomBackgroundColor">@color/skin_terminal_bar</item>
+        <item name="swipeDeleteIconColor">@color/skin_terminal_bg</item>
+        <item name="swipeDeleteBackgroundColor">@color/skin_terminal_danger</item>
+        <item name="colorTabUnderline">@color/skin_terminal_accent</item>
+        <item name="iconsInItemBackgroundColor">@color/skin_terminal_accent2</item>
+        <item name="dialogTheme">@style/DialogTheme.SkinTerminal</item>
+        <item name="alertDialogTheme">@style/AlertTheme.SkinTerminal</item>
+        <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme.SkinTerminal</item>
+        <item name="android:textViewStyle">@style/RadioTerminalText</item>
+    </style>
+    <style name="DialogTheme.SkinTerminal" parent="DialogTheme.Dark">
+        <item name="android:windowBackground">@color/skin_terminal_surface</item>
+        <item name="colorAccent">@color/skin_terminal_accent</item>
+        <item name="colorPrimary">@color/skin_terminal_accent</item>
+        <item name="colorSecondary">@color/skin_terminal_accent</item>
+        <item name="android:textColorPrimary">@color/skin_terminal_fg</item>
+        <item name="android:fontFamily">@font/vt323</item>
+    </style>
+    <style name="AlertTheme.SkinTerminal" parent="AlertTheme.Dark">
+        <item name="android:windowBackground">@color/skin_terminal_surface</item>
+        <item name="colorAccent">@color/skin_terminal_accent</item>
+        <item name="android:textColorPrimary">@color/skin_terminal_fg</item>
+        <item name="android:fontFamily">@font/vt323</item>
+    </style>
+    <style name="BottomSheetDialogTheme.SkinTerminal" parent="BottomSheetDialogTheme.Dark">
+        <item name="bottomSheetStyle">@style/BottomSheetTheme.SkinTerminal</item>
+        <item name="colorAccent">@color/skin_terminal_accent</item>
+    </style>
+    <style name="BottomSheetTheme.SkinTerminal" parent="BottomSheetTheme.Dark">
+        <item name="android:background">@color/skin_terminal_surface</item>
+    </style>
+    <color name="skin_vintage_bg">#2a1a10</color>
+    <color name="skin_vintage_bar">#1f130b</color>
+    <color name="skin_vintage_surface">#3b2416</color>
+    <color name="skin_vintage_fg">#f1e3c6</color>
+    <color name="skin_vintage_accent">#ffb347</color>
+    <color name="skin_vintage_muted">#8a6a4a</color>
+    <color name="skin_vintage_accent2">#c9a24a</color>
+    <color name="skin_vintage_danger">#b5452f</color>
+    <style name="MyMaterialTheme.SkinVintage" parent="MyMaterialTheme.Dark">
+        <item name="android:windowBackground">@color/skin_vintage_bg</item>
+        <item name="android:itemBackground">@color/skin_vintage_bg</item>
+        <item name="android:colorBackground">@color/skin_vintage_bg</item>
+        <item name="colorSurface">@color/skin_vintage_surface</item>
+        <item name="colorOnSurface">@color/skin_vintage_fg</item>
+        <item name="colorPrimary">@color/skin_vintage_bar</item>
+        <item name="colorPrimaryDark">@color/skin_vintage_bar</item>
+        <item name="colorPrimaryVariant">@color/skin_vintage_bar</item>
+        <item name="colorSecondary">@color/skin_vintage_accent</item>
+        <item name="colorAccent">@color/skin_vintage_accent</item>
+        <item name="colorAccentMy">@color/skin_vintage_accent</item>
+        <item name="colorControlActivated">@color/skin_vintage_accent</item>
+        <item name="colorControlNormal">@color/skin_vintage_muted</item>
+        <item name="colorError">@color/skin_vintage_danger</item>
+        <item name="android:textColorPrimary">@color/skin_vintage_fg</item>
+        <item name="android:textColorSecondary">@color/skin_vintage_muted</item>
+        <item name="android:textColorHint">@color/skin_vintage_muted</item>
+        <item name="android:statusBarColor">@color/skin_vintage_bar</item>
+        <item name="android:navigationBarColor">@color/skin_vintage_bar</item>
+        <item name="android:fontFamily">serif</item>
+        <item name="fontFamily">serif</item>
+        <item name="colorPlayerBackground">@color/skin_vintage_surface</item>
+        <item name="colorPlayerShadow">@color/skin_vintage_bar</item>
+        <item name="tagBackgroundColor">@color/skin_vintage_surface</item>
+        <item name="menuTextColorSelected">@color/skin_vintage_accent</item>
+        <item name="menuTextColorDefault">@color/skin_vintage_fg</item>
+        <item name="menuBottomTextColorSelected">@color/skin_vintage_accent</item>
+        <item name="menuBottomTextColorDefault">@color/skin_vintage_muted</item>
+        <item name="menuBottomBackgroundColor">@color/skin_vintage_bar</item>
+        <item name="swipeDeleteIconColor">@color/skin_vintage_bg</item>
+        <item name="swipeDeleteBackgroundColor">@color/skin_vintage_danger</item>
+        <item name="colorTabUnderline">@color/skin_vintage_accent</item>
+        <item name="iconsInItemBackgroundColor">@color/skin_vintage_accent2</item>
+        <item name="dialogTheme">@style/DialogTheme.SkinVintage</item>
+        <item name="alertDialogTheme">@style/AlertTheme.SkinVintage</item>
+        <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme.SkinVintage</item>
+    </style>
+    <style name="DialogTheme.SkinVintage" parent="DialogTheme.Dark">
+        <item name="android:windowBackground">@color/skin_vintage_surface</item>
+        <item name="colorAccent">@color/skin_vintage_accent</item>
+        <item name="colorPrimary">@color/skin_vintage_accent</item>
+        <item name="colorSecondary">@color/skin_vintage_accent</item>
+        <item name="android:textColorPrimary">@color/skin_vintage_fg</item>
+        <item name="android:fontFamily">serif</item>
+    </style>
+    <style name="AlertTheme.SkinVintage" parent="AlertTheme.Dark">
+        <item name="android:windowBackground">@color/skin_vintage_surface</item>
+        <item name="colorAccent">@color/skin_vintage_accent</item>
+        <item name="android:textColorPrimary">@color/skin_vintage_fg</item>
+        <item name="android:fontFamily">serif</item>
+    </style>
+    <style name="BottomSheetDialogTheme.SkinVintage" parent="BottomSheetDialogTheme.Dark">
+        <item name="bottomSheetStyle">@style/BottomSheetTheme.SkinVintage</item>
+        <item name="colorAccent">@color/skin_vintage_accent</item>
+    </style>
+    <style name="BottomSheetTheme.SkinVintage" parent="BottomSheetTheme.Dark">
+        <item name="android:background">@color/skin_vintage_surface</item>
+    </style>
+    <style name="RadioTerminalText" parent="android:Widget.TextView">
+        <item name="android:fontFamily">@font/vt323</item>
+        <item name="android:shadowColor">#5533ff66</item>
+        <item name="android:shadowRadius">6</item>
+    </style>
+</resources>

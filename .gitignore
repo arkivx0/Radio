@@ -42,3 +42,10 @@ build/*
 .DS_Store
 
 *.aab
+
+# Radio fork: never commit signing material
+*.jks
+*.keystore
+*.pass
+sign.sh
+*-keys/

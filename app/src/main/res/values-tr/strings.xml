@@ -198,7 +198,7 @@
 
     <string name="settings_other">Diğer</string>
     <string name="settings_statistics">İstatistikler</string>
-    <string name="settings_about">RadioDroid Hakkında</string>
+    <string name="settings_about">Radio Hakkında</string>
 
     <string-array name="weekdays">
         <item>Pz</item>

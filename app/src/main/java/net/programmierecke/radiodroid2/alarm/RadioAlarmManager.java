@@ -228,7 +228,12 @@ public class RadioAlarmManager {
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 if(BuildConfig.DEBUG) { Log.d("ALARM","START setAlarmClock"); }
-                alarmMgr.setAlarmClock(new AlarmManager.AlarmClockInfo(calendar.getTimeInMillis(),alarmIntent),alarmIntent);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmMgr.canScheduleExactAlarms()) {
+                    // No exact-alarm permission: fall back instead of crashing with SecurityException
+                    alarmMgr.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), alarmIntent);
+                } else {
+                    alarmMgr.setAlarmClock(new AlarmManager.AlarmClockInfo(calendar.getTimeInMillis(),alarmIntent),alarmIntent);
+                }
             }else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 if(BuildConfig.DEBUG) { Log.d("ALARM","START setExact"); }
                 alarmMgr.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), alarmIntent);

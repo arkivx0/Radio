@@ -335,6 +335,17 @@ public class ItemAdapterStation
             holder.textViewTitle.setTextColor(tv.data);
         }
 
+        android.graphics.Typeface hf = Utils.getSkinHeadingFont(getContext());
+        if (holder.textViewTitle.getTag(R.id.textViewTitle) == null)
+            holder.textViewTitle.setTag(R.id.textViewTitle, holder.textViewTitle.getTextSize());
+        float baseSize = (Float) holder.textViewTitle.getTag(R.id.textViewTitle);
+        if (hf != null) {
+            holder.textViewTitle.setTypeface(hf, playingStationPosition == position ? Typeface.BOLD : Typeface.NORMAL);
+            holder.textViewTitle.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, baseSize * 1.18f);
+        }
+        int glow = Utils.getSkinGlow(getContext());
+        if (glow != 0 && playingStationPosition == position) holder.textViewTitle.setShadowLayer(14f, 0f, 0f, glow);
+        else holder.textViewTitle.setShadowLayer(0f, 0f, 0f, 0);
         holder.textViewTitle.setText(station.Name);
         holder.textViewShortDescription.setText(station.getShortDetails(getContext()));
         holder.textViewTags.setText(station.TagsAll.replace(",", ", "));

@@ -62,4 +62,8 @@
         android:title="@string/action_delete"
         android:icon="@drawable/ic_delete_white_24dp"
         app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_record_schedules"
+        android:title="Scheduled recordings"
+        app:showAsAction="never" />
 </menu>

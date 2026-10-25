@@ -78,7 +78,7 @@ import static android.content.Intent.ACTION_MEDIA_BUTTON;
 
 public class PlayerService extends JobIntentService implements RadioPlayer.PlayerListener {
     protected static final int NOTIFY_ID = 1;
-    private static final String NOTIFICATION_CHANNEL_ID = "default";
+    private static final String NOTIFICATION_CHANNEL_ID = "radio_playback_v3";
 
     public static final String METERED_CONNECTION_WARNING_KEY = "warn_no_wifi";
 
@@ -100,6 +100,14 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
     private final String ACTION_PAUSE = "pause";
     private final String ACTION_RESUME = "resume";
     private final String ACTION_SKIP_TO_NEXT = "next";
+    private final String ACTION_RECORD_TOGGLE = "record_toggle";
+    public static final String ACTION_SKIP_BACK = "skip_back5";
+    public static final String ACTION_GO_LIVE = "go_live";
+    public static final String CUSTOM_RECORD = "custom_record";
+    public static final String ACTION_SCHEDULED_RECORD = "scheduled_record";
+    public static final String EXTRA_REC_STATION = "rec_station";
+    public static final String EXTRA_REC_MINUTES = "rec_minutes";
+    private Runnable scheduledStop = null;
     private final String ACTION_SKIP_TO_PREVIOUS = "previous";
     private final String ACTION_STOP = "stop";
 
@@ -300,6 +308,16 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
         }
 
         @Override
+        public void shiftBy(long deltaMs) throws RemoteException {
+            PlayerService.this.shiftBy(deltaMs);
+        }
+
+        @Override
+        public long getBehindLiveMs() throws RemoteException {
+            return radioPlayer != null ? radioPlayer.getBehindLiveMs() : 0;
+        }
+
+        @Override
         public long getBufferedSeconds() throws RemoteException {
             if (radioPlayer != null) {
                 return radioPlayer.getBufferedSeconds();
@@ -356,8 +374,12 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
                             if (BuildConfig.DEBUG) Log.d(TAG, "audio focus gain");
 
                             if (pauseReason == PauseReason.FOCUS_LOSS_TRANSIENT) {
-                                enableMediaSession();
-                                resume();
+                                try {
+                                    enableMediaSession();
+                                    resume();
+                                } catch (Exception e) {
+                                    Log.e(TAG, "resume after focus gain failed", e);
+                                }
                             }
 
                             radioPlayer.setVolume(FULL_VOLUME);
@@ -479,10 +501,17 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
 
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "RadioDroid2 Player", NotificationManager.IMPORTANCE_LOW);
+            // Radio fork: IMPORTANCE_LOW is a "silent" channel, which Android 12+ (and Motorola by
+            // default) hides from the lock screen. Use DEFAULT importance without sound/vibration,
+            // public lock screen visibility, and a new channel id because channel settings are sticky.
+            try { notificationManager.deleteNotificationChannel("default"); } catch (Exception ignored) { }
+            NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "Playback controls", NotificationManager.IMPORTANCE_DEFAULT);
+            notificationChannel.setSound(null, null);
+            notificationChannel.setShowBadge(false);
+            notificationChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
 
             // Configure the notification channel.
-            notificationChannel.setDescription("Channel description");
+            notificationChannel.setDescription("Now playing and lock screen controls");
             notificationChannel.enableLights(false);
             notificationChannel.enableVibration(false);
             notificationManager.createNotificationChannel(notificationChannel);
@@ -532,6 +561,18 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
                     case ACTION_SKIP_TO_NEXT:
                         next();
                         break;
+                    case ACTION_SCHEDULED_RECORD:
+                        startScheduledRecording(intent);
+                        break;
+                    case ACTION_SKIP_BACK:
+                        shiftBy(5000);
+                        break;
+                    case ACTION_GO_LIVE:
+                        shiftBy(Long.MIN_VALUE);
+                        break;
+                    case ACTION_RECORD_TOGGLE:
+                        toggleRecordingFromNotification();
+                        break;
                     case ACTION_STOP:
                         stop();
                         return START_NOT_STICKY;
@@ -574,13 +615,10 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     // On Android O+ we MUST show notification if started via startForegroundService
 
-                    NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID,
-                            "Temporary", NotificationManager.IMPORTANCE_DEFAULT);
-                    ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(channel);
                     Notification notification = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
                             .setContentTitle("")
                             .setContentText("").build();
-                    startForeground(NOTIFY_ID, notification);
+                    safeStartForeground(notification);
                     stopForeground(true);
                 } else {
                     stopSelf();
@@ -731,6 +769,10 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
 
     public void stop() {
         if (BuildConfig.DEBUG) Log.d(TAG, "stopping playback.");
+        if (scheduledStop != null) {
+            handler.removeCallbacks(scheduledStop);
+            scheduledStop = null;
+        }
 
         this.pauseReason = PauseReason.NONE;
         this.lastMeteredConnectionWarningTime = 0;
@@ -774,6 +816,12 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
 
         PlaybackStateCompat.Builder playbackStateBuilder = new PlaybackStateCompat.Builder();
         playbackStateBuilder.setActions(actions);
+        playbackStateBuilder.addCustomAction(ACTION_SKIP_BACK, "Back 5s", R.drawable.ic_replay5_24dp);
+        if (radioPlayer != null && radioPlayer.getBehindLiveMs() > 0)
+            playbackStateBuilder.addCustomAction(ACTION_GO_LIVE, "Go live", R.drawable.ic_golive_24dp);
+        playbackStateBuilder.addCustomAction(CUSTOM_RECORD,
+                radioPlayer != null && radioPlayer.isRecording() ? "Stop recording" : "Record",
+                radioPlayer != null && radioPlayer.isRecording() ? R.drawable.ic_stop_recording : R.drawable.ic_start_recording);
 
         if (state == PlaybackStateCompat.STATE_ERROR) {
             String error = "";
@@ -932,10 +980,19 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
                 .setWhen(System.currentTimeMillis())
                 .setTicker(theTicker)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setCategory(NotificationCompat.CATEGORY_TRANSPORT)
+                .setOnlyAlertOnce(true)
+                .setShowWhen(false)
+                .setColor(Utils.getSkinAccent(itsContext))
                 .setSmallIcon(R.drawable.ic_play_arrow_white_24dp)
                 .setLargeIcon(radioIcon.getBitmap())
-                .addAction(R.drawable.ic_stop_white_24dp, getString(R.string.action_stop), pendingIntentStop)
-                .addAction(R.drawable.ic_skip_previous_24dp, getString(R.string.action_skip_to_previous), pendingIntentPrevious);
+                .addAction(R.drawable.ic_skip_previous_24dp, getString(R.string.action_skip_to_previous), pendingIntentPrevious)
+                .addAction(R.drawable.ic_replay5_24dp, "Back 5s", PendingIntent.getService(itsContext, 0,
+                        new Intent(itsContext, PlayerService.class).setAction(ACTION_SKIP_BACK), pendingIntentFlag));
+        long behind = radioPlayer.getBehindLiveMs();
+        if (behind > 0) {
+            notificationBuilder.setSubText(String.format(java.util.Locale.US, "-%d:%02d behind live", behind / 60000, (behind / 1000) % 60));
+        }
 
         if (currentPlayerState == PlayState.Playing || currentPlayerState == PlayState.PrePlaying) {
             Intent pauseIntent = new Intent(itsContext, PlayerService.class);
@@ -956,7 +1013,13 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
                     .setOngoing(false);
         }
 
+        Intent recIntent = new Intent(itsContext, PlayerService.class);
+        recIntent.setAction(ACTION_RECORD_TOGGLE);
+        PendingIntent pendingIntentRec = PendingIntent.getService(itsContext, 0, recIntent, pendingIntentFlag);
+
         notificationBuilder.addAction(R.drawable.ic_skip_next_24dp, getString(R.string.action_skip_to_next), pendingIntentNext)
+                .addAction(radioPlayer.isRecording() ? R.drawable.ic_stop_recording : R.drawable.ic_start_recording,
+                        radioPlayer.isRecording() ? "Stop rec" : "Record", pendingIntentRec)
                 .setStyle(new MediaStyle()
                         .setMediaSession(mediaSession.getSessionToken())
                         .setShowActionsInCompactView(1, 2, 3 /* previous, play/pause, next */)
@@ -964,12 +1027,90 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
                         .setShowCancelButton(true));
         Notification notification = notificationBuilder.build();
 
-        startForeground(NOTIFY_ID, notification);
+        safeStartForeground(notification);
         notificationIsActive = true;
 
-        if (currentPlayerState == PlayState.Paused || currentPlayerState == PlayState.Idle) {
+        if ((currentPlayerState == PlayState.Paused || currentPlayerState == PlayState.Idle)
+                && pauseReason != PauseReason.FOCUS_LOSS_TRANSIENT) {
             stopForeground(false); // necessary to make notification dismissible
         }
+    }
+
+    // Radio fork: never let a foreground-service restriction (Android 12+
+    // ForegroundServiceStartNotAllowedException, Android 14 type checks) kill the service,
+    // e.g. when audio focus returns after a phone call while the app is in background.
+    private boolean safeStartForeground(Notification notification) {
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                startForeground(NOTIFY_ID, notification, android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK);
+            } else {
+                startForeground(NOTIFY_ID, notification);
+            }
+            return true;
+        } catch (Exception e) {
+            Log.e(TAG, "startForeground not allowed, posting plain notification", e);
+            try {
+                NotificationManagerCompat.from(this).notify(NOTIFY_ID, notification);
+            } catch (Exception ignored) {
+            }
+            return false;
+        }
+    }
+
+    private void startScheduledRecording(Intent intent) {
+        DataRadioStation st = DataRadioStation.DecodeJsonSingle(intent.getStringExtra(EXTRA_REC_STATION));
+        final int minutes = intent.getIntExtra(EXTRA_REC_MINUTES, 60);
+        if (st == null) return;
+        setStation(st);
+        playCurrentStation(false);
+        updateNotification(PlayState.PrePlaying); // go foreground immediately (5 s rule)
+        final long deadline = System.currentTimeMillis() + 90_000;
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if (radioPlayer.isPlaying()) {
+                        if (!radioPlayer.isRecording()) itsBinder.startRecording();
+                        updateNotification();
+                        if (scheduledStop != null) handler.removeCallbacks(scheduledStop);
+                        scheduledStop = () -> {
+                            try {
+                                if (radioPlayer.isRecording()) itsBinder.stopRecording();
+                            } catch (Exception ignored) {
+                            }
+                            stop();
+                        };
+                        handler.postDelayed(scheduledStop, minutes * 60_000L);
+                    } else if (System.currentTimeMillis() < deadline) {
+                        handler.postDelayed(this, 2000);
+                    } else {
+                        Log.e(TAG, "scheduled recording: stream never started");
+                        stop();
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, "scheduled recording failed", e);
+                }
+            }
+        });
+    }
+
+    void shiftBy(long deltaMs) {
+        if (radioPlayer == null || !radioPlayer.isPlaying()) return;
+        radioPlayer.shiftBy(deltaMs);
+        // state refresh after the player re-prepared
+        handler.postDelayed(() -> {
+            updateNotification();
+            sendBroadCast(PLAYER_SERVICE_META_UPDATE);
+        }, 600);
+    }
+
+    void toggleRecordingFromNotification() {
+        try {
+            if (radioPlayer.isRecording()) itsBinder.stopRecording(); else itsBinder.startRecording();
+        } catch (Exception e) {
+            Log.e(TAG, "record toggle failed", e);
+        }
+        updateNotification();
     }
 
     private void toastOnUi(final int messageId) {

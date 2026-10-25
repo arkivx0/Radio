@@ -172,7 +172,7 @@
 
     <string name="settings_other">Другое</string>
     <string name="settings_statistics">Статистика</string>
-    <string name="settings_about">Про RadioDroid</string>
+    <string name="settings_about">Про Radio</string>
 
     <string-array name="weekdays">
         <item>В</item>

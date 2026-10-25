@@ -163,7 +163,7 @@ public class RecordingsManager {
     }
 
     public static String getRecordDir() {
-        String pathRecordings = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC) + "/Recordings";
+        String pathRecordings = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC) + "/Radio";
         File folder = new File(pathRecordings);
         if (!folder.exists()) {
             if (!folder.mkdirs()) {

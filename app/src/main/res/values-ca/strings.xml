@@ -113,7 +113,7 @@
     <string name="settings_alarm">Alarma</string>
     <string name="settings_alarm_external">Habiliteu l\'aplicació externa</string>
     <string name="settings_alarm_external_desc_on">Obriu l\'alarma amb una aplicació externa predeterminada</string>
-    <string name="settings_alarm_external_desc_off">Obriu l\'alarma amb RadioDroid</string>
+    <string name="settings_alarm_external_desc_off">Obriu l\'alarma amb Radio</string>
     <string name="settings_alarm_audio_player">Reproductor d\'àudio</string>
     <string name="settings_alarm_sleep_timer">Temporitzador</string>
     <string name="settings_alarm_sleep_timer_desc">Deixa de reproduir després de %1$s minuts</string>
@@ -123,7 +123,7 @@
     <string name="settings_auto_play_on_startup_off">No reproduir la darrera emissora a l\'inici</string>
     <string name="settings_play_external">Activa el reproductor extern</string>
     <string name="settings_play_external_desc_on">Reprodueix emissores amb reproductor extern</string>
-    <string name="settings_play_external_desc_off">Reprodueix les emissores amb RadioDroid</string>
+    <string name="settings_play_external_desc_off">Reprodueix les emissores amb Radio</string>
     <string name="settings_equalizer">Equalitzador</string>
 
     <string name="settings_warn_no_wifi">Avís sense connexió sense fils</string>
@@ -208,7 +208,7 @@
 
     <string name="media_route_menu_title">GoogleCast</string>
     <string name="app_id">5A97BAE4</string>
-    <string name="app_name">RadioDroid</string>
+    <string name="app_name">Radio</string>
 
     <string name="settings_mpd">Music Player Daemon</string>
     <string name="settings_mpd_port">Port MPD</string>
@@ -219,7 +219,7 @@
 
     <string name="settings_other">Altres</string>
     <string name="settings_statistics">Estadístiques</string>
-    <string name="settings_about">Quant a RadioDroid</string>
+    <string name="settings_about">Quant a Radio</string>
 
     <string-array name="weekdays">
         <item>dg</item>

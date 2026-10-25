@@ -11,5 +11,6 @@ public class BootReceiver extends BroadcastReceiver{
     public void onReceive(Context context, Intent intent) {
         RadioDroidApp radioDroidApp = (RadioDroidApp)context.getApplicationContext();
         radioDroidApp.getAlarmManager().resetAllAlarms();
+        net.programmierecke.radiodroid2.recording.RecordSchedules.rescheduleAll(context);
     }
 }

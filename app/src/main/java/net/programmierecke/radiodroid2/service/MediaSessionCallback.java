@@ -51,6 +51,21 @@ public class MediaSessionCallback extends MediaSessionCompat.Callback {
     }
 
     @Override
+    public void onCustomAction(String action, Bundle extras) {
+        try {
+            switch (action) {
+                case PlayerService.ACTION_SKIP_BACK: playerService.shiftBy(5000); break;
+                case PlayerService.ACTION_GO_LIVE: playerService.shiftBy(Long.MIN_VALUE); break;
+                case PlayerService.CUSTOM_RECORD:
+                    if (playerService.isRecording()) playerService.stopRecording(); else playerService.startRecording();
+                    break;
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public void onPause() {
         try {
             playerService.Pause(PauseReason.USER);

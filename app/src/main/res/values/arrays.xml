@@ -41,10 +41,28 @@
     <string-array name="theme_entries">
         <item>@string/theme_light</item>
         <item>@string/theme_dark</item>
+        <item>@string/theme_omarchy</item>
+        <item>@string/theme_amoled</item>
+        <item>@string/theme_gruvbox</item>
+        <item>@string/theme_catppuccin</item>
+        <item>@string/theme_nord</item>
+        <item>@string/theme_dracula</item>
+        <item>@string/theme_enclave</item>
+        <item>@string/theme_terminal</item>
+        <item>@string/theme_vintage</item>
     </string-array>
     <string-array name="theme_values">
         <item>@string/theme_light</item>
         <item>@string/theme_dark</item>
+        <item>@string/theme_omarchy</item>
+        <item>@string/theme_amoled</item>
+        <item>@string/theme_gruvbox</item>
+        <item>@string/theme_catppuccin</item>
+        <item>@string/theme_nord</item>
+        <item>@string/theme_dracula</item>
+        <item>@string/theme_enclave</item>
+        <item>@string/theme_terminal</item>
+        <item>@string/theme_vintage</item>
     </string-array>
 
     <string-array name="settings_record_name_formatting_list">

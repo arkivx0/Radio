@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="theme_omarchy" translatable="false">Omarchy (Tokyo Night)</string>
+    <string name="theme_amoled" translatable="false">AMOLED Black</string>
+    <string name="theme_gruvbox" translatable="false">Gruvbox Dark</string>
+    <string name="theme_catppuccin" translatable="false">Catppuccin Mocha</string>
+    <string name="theme_nord" translatable="false">Nord</string>
+    <string name="theme_dracula" translatable="false">Dracula</string>
+    <string name="theme_enclave" translatable="false">Enclave</string>
+    <string name="theme_terminal" translatable="false">Terminal (green phosphor)</string>
+    <string name="theme_vintage" translatable="false">Vintage (tube radio)</string>
+</resources>

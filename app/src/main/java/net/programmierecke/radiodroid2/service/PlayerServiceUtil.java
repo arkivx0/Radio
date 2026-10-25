@@ -338,6 +338,19 @@ public class PlayerServiceUtil {
         }
     }
 
+    public static void shiftBy(long deltaMs) {
+        if (itsPlayerService != null) {
+            try { itsPlayerService.shiftBy(deltaMs); } catch (RemoteException e) { Log.e("", "" + e); }
+        }
+    }
+
+    public static long getBehindLiveMs() {
+        if (itsPlayerService != null) {
+            try { return itsPlayerService.getBehindLiveMs(); } catch (RemoteException e) { Log.e("", "" + e); }
+        }
+        return 0;
+    }
+
     public static boolean isRecording() {
         if (itsPlayerService != null) {
             try {
