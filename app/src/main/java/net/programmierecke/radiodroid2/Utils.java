@@ -359,6 +359,22 @@ public class Utils {
                 });
     }
 
+    /** Radio fork: user-visible file name for a content:// or file:// URI. */
+    public static String getDisplayName(Context context, android.net.Uri uri) {
+        String name = null;
+        if ("content".equals(uri.getScheme())) {
+            try (android.database.Cursor c = context.getContentResolver().query(uri,
+                    new String[]{android.provider.OpenableColumns.DISPLAY_NAME}, null, null, null)) {
+                if (c != null && c.moveToFirst()) name = c.getString(0);
+            } catch (Exception ignored) {
+            }
+        }
+        if (name == null) name = uri.getLastPathSegment();
+        if (name == null) name = uri.toString();
+        int slash = name.lastIndexOf('/');
+        return slash >= 0 ? name.substring(slash + 1) : name;
+    }
+
     public static boolean urlIndicatesHlsStream(String streamUrl) {
         final Pattern p = Pattern.compile(".*\\.m3u8([#?\\s].*)?$");
         return p.matcher(streamUrl).matches();
@@ -375,7 +391,7 @@ public class Utils {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(radioDroidApp);
         final boolean warnOnMetered = sharedPref.getBoolean("warn_no_wifi", false);
 
-        if (warnOnMetered && ConnectivityChecker.getCurrentConnectionType(radioDroidApp) == ConnectivityChecker.ConnectionType.METERED) {
+        if (warnOnMetered && !station.isLocalFile() && ConnectivityChecker.getCurrentConnectionType(radioDroidApp) == ConnectivityChecker.ConnectionType.METERED) {
             warningCallback.warn(station, playerType);
         } else {
             playFunc.run();

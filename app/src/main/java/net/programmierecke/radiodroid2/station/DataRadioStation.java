@@ -69,6 +69,24 @@ public class DataRadioStation implements Parcelable {
 
 	public String playableUrl;
 
+	/** Radio fork: true for content:// or file:// URLs (local audio files, recordings). */
+	public static boolean isLocalFileUrl(String url) {
+		return url != null && (url.startsWith("content:") || url.startsWith("file:"));
+	}
+
+	public boolean isLocalFile() {
+		return isLocalFileUrl(playableUrl);
+	}
+
+	public static DataRadioStation fromLocalFile(String url, String displayName) {
+		DataRadioStation s = new DataRadioStation();
+		s.Name = displayName;
+		s.StreamUrl = url;
+		s.playableUrl = url;
+		s.IconUrl = "";
+		return s;
+	}
+
 	public StationSaveManager queue;
 	
 	@Deprecated

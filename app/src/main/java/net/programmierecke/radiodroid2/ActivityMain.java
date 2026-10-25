@@ -527,7 +527,45 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
         castHandler.setActivity(null);
     }
 
+    // Radio fork: local audio file opened with Radio, waiting for the player service to bind
+    private DataRadioStation pendingLocalFile;
+
+    private boolean handleOpenAudioIntent(@NonNull Intent intent) {
+        final String action = intent.getAction();
+        Uri uri = null;
+        if (Intent.ACTION_VIEW.equals(action)) {
+            uri = intent.getData();
+        } else if (Intent.ACTION_SEND.equals(action)) {
+            uri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
+            if (uri == null) uri = intent.getData();
+        }
+        if (uri == null || !DataRadioStation.isLocalFileUrl(uri.toString())) {
+            return false;
+        }
+        if ("content".equals(uri.getScheme())) {
+            try {
+                getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            } catch (Exception ignored) {
+                // Only documents from the system picker are persistable; the temporary grant is enough.
+            }
+        }
+        final DataRadioStation local = DataRadioStation.fromLocalFile(uri.toString(), Utils.getDisplayName(this, uri));
+        if (!PlayerServiceUtil.isServiceAvailable()) {
+            pendingLocalFile = local;
+            PlayerServiceUtil.startService(getApplicationContext());
+        } else {
+            PlayerServiceUtil.play(local);
+        }
+        if (playerBottomSheet != null) {
+            playerBottomSheet.setState(BottomSheetBehavior.STATE_EXPANDED);
+        }
+        return true;
+    }
+
     private void handleIntent(@NonNull Intent intent) {
+        if (handleOpenAudioIntent(intent)) {
+            return;
+        }
         String action = intent.getAction();
         final Bundle extras = intent.getExtras();
         if (extras == null) {
@@ -1076,10 +1114,17 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
         filter.addAction(ACTION_SHOW_LOADING);
         filter.addAction(PlayerService.PLAYER_SERVICE_STATE_CHANGE);
         filter.addAction(PlayerService.PLAYER_SERVICE_METERED_CONNECTION);
+        filter.addAction(PlayerService.PLAYER_SERVICE_BOUND);
         broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                if (intent.getAction().equals(ACTION_HIDE_LOADING)) {
+                if (intent.getAction().equals(PlayerService.PLAYER_SERVICE_BOUND)) {
+                    if (pendingLocalFile != null) {
+                        DataRadioStation local = pendingLocalFile;
+                        pendingLocalFile = null;
+                        PlayerServiceUtil.play(local);
+                    }
+                } else if (intent.getAction().equals(ACTION_HIDE_LOADING)) {
                     hideLoadingIcon();
                 } else if (intent.getAction().equals(ACTION_SHOW_LOADING)) {
                     showLoadingIcon();

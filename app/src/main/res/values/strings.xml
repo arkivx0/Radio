@@ -357,4 +357,5 @@
     <string name="context_menu_create_shortcut">@string/detail_create_shortcut</string>
     <string name="context_menu_delete">@string/action_delete</string>
     <string name="alarm_no_station_selected">Play a station first. New alarms use the most recently played station.</string>
+    <string name="error_no_app_for_recording">No other app can open this recording.</string>
 </resources>

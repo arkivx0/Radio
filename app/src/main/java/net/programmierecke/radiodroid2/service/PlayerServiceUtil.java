@@ -147,6 +147,10 @@ public class PlayerServiceUtil {
         }
     }
 
+    public static boolean isServiceAvailable() {
+        return itsPlayerService != null;
+    }
+
     public static void play(DataRadioStation station) {
         if (itsPlayerService != null) {
             try {

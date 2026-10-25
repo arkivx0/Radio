@@ -313,6 +313,11 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
         }
 
         @Override
+        public void seekTo(long positionMs) throws RemoteException {
+            PlayerService.this.seekTo(positionMs);
+        }
+
+        @Override
         public long getBehindLiveMs() throws RemoteException {
             return radioPlayer != null ? radioPlayer.getBehindLiveMs() : 0;
         }
@@ -694,7 +699,7 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
     }
 
     public void next() {
-        if (currentStation == null) {
+        if (currentStation == null || currentStation.queue == null) {
             return;
         }
 
@@ -713,7 +718,7 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
     }
 
     public void previous() {
-        if (currentStation == null) {
+        if (currentStation == null || currentStation.queue == null) {
             return;
         }
 
@@ -817,9 +822,13 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
         PlaybackStateCompat.Builder playbackStateBuilder = new PlaybackStateCompat.Builder();
         playbackStateBuilder.setActions(actions);
         playbackStateBuilder.addCustomAction(ACTION_SKIP_BACK, "Back 5s", R.drawable.ic_replay5_24dp);
+        final boolean local = radioPlayer != null && radioPlayer.isLocalFile();
+        if (local) {
+            actions |= PlaybackStateCompat.ACTION_SEEK_TO;
+        }
         if (radioPlayer != null && radioPlayer.getBehindLiveMs() > 0)
             playbackStateBuilder.addCustomAction(ACTION_GO_LIVE, "Go live", R.drawable.ic_golive_24dp);
-        playbackStateBuilder.addCustomAction(CUSTOM_RECORD,
+        if (!local) playbackStateBuilder.addCustomAction(CUSTOM_RECORD,
                 radioPlayer != null && radioPlayer.isRecording() ? "Stop recording" : "Record",
                 radioPlayer != null && radioPlayer.isRecording() ? R.drawable.ic_stop_recording : R.drawable.ic_start_recording);
 
@@ -841,7 +850,9 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
             playbackStateBuilder.setErrorMessage(PlaybackStateCompat.ERROR_CODE_ACTION_ABORTED, error);
         }
 
-        playbackStateBuilder.setState(state, PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN, 1.0f);
+        long position = local ? radioPlayer.getPositionMs() : PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN;
+        playbackStateBuilder.setState(state, position,
+                state == PlaybackStateCompat.STATE_PLAYING ? 1.0f : 0f);
         mediaSession.setPlaybackState(playbackStateBuilder.build());
     }
 
@@ -1094,6 +1105,15 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
         });
     }
 
+    void seekTo(long positionMs) {
+        if (radioPlayer == null) return;
+        radioPlayer.seekTo(positionMs);
+        handler.postDelayed(() -> {
+            updateNotification();
+            sendBroadCast(PLAYER_SERVICE_META_UPDATE);
+        }, 300);
+    }
+
     void shiftBy(long deltaMs) {
         if (radioPlayer == null || !radioPlayer.isPlaying()) return;
         radioPlayer.shiftBy(deltaMs);
@@ -1150,7 +1170,7 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
 
                 if (mediaSession != null) {
                     final MediaMetadataCompat.Builder builder = new MediaMetadataCompat.Builder();
-                    builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, -1);
+                    builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, radioPlayer.isLocalFile() ? radioPlayer.getDurationMs() : -1);
                     builder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM, currentStation.Name);
                     builder.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, liveInfo.getArtist());
                     builder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, liveInfo.getTrack());

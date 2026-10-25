@@ -39,6 +39,7 @@ PauseReason getPauseReason();
 boolean isNotificationActive();
 void shiftBy(long deltaMs);
 long getBehindLiveMs();
+void seekTo(long positionMs);
 
 void enableMPD(String hostname, int port);
 void disableMPD();

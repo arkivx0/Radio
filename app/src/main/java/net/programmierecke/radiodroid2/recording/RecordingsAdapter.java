@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.FileProvider;
+import net.programmierecke.radiodroid2.station.DataRadioStation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import net.programmierecke.radiodroid2.BuildConfig;
@@ -69,6 +70,10 @@ public class RecordingsAdapter extends RecyclerView.Adapter<RecordingsAdapter.Re
                 openRecording(recording);
             }
         });
+        holder.viewRoot.setOnLongClickListener(view -> {
+            openRecordingWith(recording);
+            return true;
+        });
     }
 
     public void setRecordings(List<DataRecording> recordings) {
@@ -95,39 +100,36 @@ public class RecordingsAdapter extends RecyclerView.Adapter<RecordingsAdapter.Re
         return recordings != null ? recordings.size() : 0;
     }
 
+    // Radio fork: tap plays the recording in Radio's own player (seekable, lock-screen controls)
     void openRecording(DataRecording theData) {
-        ProgressDialog dialog = ProgressDialog.show(context, "Loading...", "Please wait...", true, false);
-        String path = RecordingsManager.getRecordDir() + "/" + theData.Name;
+        File file = new File(RecordingsManager.getRecordDir() + "/" + theData.Name);
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "play: " + path);
+            Log.d(TAG, "play: " + file);
         }
+        net.programmierecke.radiodroid2.service.PlayerServiceUtil.play(
+                DataRadioStation.fromLocalFile(Uri.fromFile(file).toString(), theData.Name));
+    }
 
-        Intent i = new Intent(path);
-        i.setAction(android.content.Intent.ACTION_VIEW);
-
-        File file = new File(path);
-        Uri fileUri = FileProvider.getUriForFile(context, context.getPackageName() + ".fileprovider", file);
+    // Long press: hand the recording to another app through our FileProvider
+    void openRecordingWith(DataRecording theData) {
+        File file = new File(RecordingsManager.getRecordDir() + "/" + theData.Name);
+        Uri fileUri;
+        try {
+            fileUri = FileProvider.getUriForFile(context, context.getPackageName() + ".fileprovider", file);
+        } catch (IllegalArgumentException e) {
+            Log.e(TAG, "cannot share recording", e);
+            return;
+        }
+        Intent i = new Intent(Intent.ACTION_VIEW);
         i.setDataAndType(fileUri, "audio/*");
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            i.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            ClipData clip = ClipData.newUri(context.getContentResolver(), "Record", fileUri);
-            i.setClipData(clip);
-            i.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        } else {
-            List<ResolveInfo> resInfoList =
-                    context.getPackageManager().queryIntentActivities(i, PackageManager.MATCH_DEFAULT_ONLY);
-
-            for (ResolveInfo resolveInfo : resInfoList) {
-                String packageName = resolveInfo.activityInfo.packageName;
-                context.grantUriPermission(packageName, fileUri,
-                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                dialog.dismiss();
-            }
+        i.setClipData(ClipData.newUri(context.getContentResolver(), "Record", fileUri));
+        i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        Intent chooser = Intent.createChooser(i, null);
+        if (!(context instanceof android.app.Activity)) chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        try {
+            context.startActivity(chooser);
+        } catch (android.content.ActivityNotFoundException e) {
+            android.widget.Toast.makeText(context, R.string.error_no_app_for_recording, android.widget.Toast.LENGTH_SHORT).show();
         }
-
-        context.startActivity(i);
-        dialog.dismiss();
     }
 }

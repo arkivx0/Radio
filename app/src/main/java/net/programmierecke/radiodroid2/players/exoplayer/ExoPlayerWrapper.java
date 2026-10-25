@@ -85,7 +85,7 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
     private final BroadcastReceiver networkChangedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (fullStopTask != null && player != null && audioSource != null && Utils.hasAnyConnection(context)) {
+            if (!localFile && fullStopTask != null && player != null && audioSource != null && Utils.hasAnyConnection(context)) {
                 Log.i(TAG, "Regained connection. Resuming playback.");
 
                 cancelStopTask();
@@ -142,7 +142,23 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
         DataSource.Factory dataSourceFactory = new RadioDataSourceFactory(httpClient, bandwidthMeter, this, retryTimeout, retryDelay);
         // Produces Extractor instances for parsing the media data.
         stopTimeShift();
-        if (!isHls) {
+        localFile = net.programmierecke.radiodroid2.station.DataRadioStation.isLocalFileUrl(streamUrl);
+        if (localFile) {
+            // Radio fork: local file (recording or file opened with Radio) - normal seekable playback
+            isHls = false;
+            if (!streamUrl.equals(localResumeUrl)) {
+                localResumeMs = 0;
+            }
+            localResumeUrl = streamUrl;
+            audioSource = new ProgressiveMediaSource.Factory(
+                    new com.google.android.exoplayer2.upstream.DefaultDataSource.Factory(context))
+                    .createMediaSource(MediaItem.fromUri(Uri.parse(streamUrl)));
+            player.setMediaSource(audioSource);
+            player.prepare();
+            if (localResumeMs > 0) {
+                player.seekTo(localResumeMs);
+            }
+        } else if (!isHls) {
             // Radio fork: route progressive streams through the time-shift ring buffer
             timeShift = new TimeShiftBuffer(dataSourceFactory, Uri.parse(streamUrl));
             timeShift.start();
@@ -170,6 +186,38 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
     private TimeShiftBuffer timeShift;
     private long shiftMs;
 
+    // Radio fork: local file playback state
+    private boolean localFile;
+    private String localResumeUrl;
+    private long localResumeMs;
+
+    public boolean isLocalFile() {
+        return localFile;
+    }
+
+    public long getPositionMs() {
+        return player != null ? Math.max(0, player.getCurrentPosition()) : (localFile ? localResumeMs : 0);
+    }
+
+    public long getDurationMs() {
+        if (player == null) return -1;
+        long d = player.getDuration();
+        return d == C.TIME_UNSET ? -1 : d;
+    }
+
+    /** Seek within a local file. Must run on player thread. */
+    public void seekTo(long positionMs) {
+        if (!localFile) return;
+        positionMs = Math.max(0, positionMs);
+        long d = getDurationMs();
+        if (d > 0) positionMs = Math.min(positionMs, d);
+        if (player != null) {
+            player.seekTo(positionMs);
+        } else {
+            localResumeMs = positionMs;
+        }
+    }
+
     private void stopTimeShift() {
         if (timeShift != null) {
             timeShift.stop();
@@ -184,6 +232,11 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
 
     /** Move playback deltaMs further behind live (negative = towards live). Must run on player thread. */
     public void shiftBy(long deltaMs) {
+        if (localFile) {
+            // "Back 5s" on a local file is a plain relative seek; "Go live" means nothing here.
+            if (deltaMs != Long.MIN_VALUE) seekTo(getPositionMs() - deltaMs);
+            return;
+        }
         if (!canTimeShift()) return;
         long target = deltaMs == Long.MIN_VALUE ? 0 : Math.max(0, shiftMs + deltaMs);
         target = Math.min(target, timeShift.maxBehindMs());
@@ -203,6 +256,9 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
     public void pause() {
         Log.i(TAG, "Pause. Stopping exoplayer.");
         stopTimeShift();
+        if (localFile && player != null) {
+            localResumeMs = Math.max(0, player.getCurrentPosition());
+        }
 
         cancelStopTask();
 
@@ -218,6 +274,8 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
     public void stop() {
         Log.i(TAG, "Stopping exoplayer.");
         stopTimeShift();
+        localResumeMs = 0;
+        localResumeUrl = null;
 
         cancelStopTask();
 
@@ -421,7 +479,7 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
 
     @Override
     public boolean canRecord() {
-        return player != null;
+        return player != null && !localFile;
     }
 
     @Override

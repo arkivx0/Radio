@@ -121,6 +121,12 @@ public class RadioPlayer implements PlayerWrapper.PlayListener, Recordable {
     public final void play(final DataRadioStation station, final boolean isAlarm) {
         setState(PlayState.PrePlaying, -1);
 
+        if (station.isLocalFile()) {
+            // Radio fork: local files need no station lookup on the directory server
+            play(station.playableUrl, station.Name, isAlarm);
+            return;
+        }
+
         playStationTask = new PlayStationTask(station, mainContext,
                 (url) -> RadioPlayer.this.play(station.playableUrl, station.Name, isAlarm),
                 (executionResult) -> {
@@ -140,6 +146,26 @@ public class RadioPlayer implements PlayerWrapper.PlayListener, Recordable {
             if (currentPlayer instanceof net.programmierecke.radiodroid2.players.exoplayer.ExoPlayerWrapper)
                 ((net.programmierecke.radiodroid2.players.exoplayer.ExoPlayerWrapper) currentPlayer).shiftBy(deltaMs);
         });
+    }
+
+    public void seekTo(final long positionMs) {
+        playerThreadHandler.post(() -> {
+            if (currentPlayer instanceof net.programmierecke.radiodroid2.players.exoplayer.ExoPlayerWrapper)
+                ((net.programmierecke.radiodroid2.players.exoplayer.ExoPlayerWrapper) currentPlayer).seekTo(positionMs);
+        });
+    }
+
+    public boolean isLocalFile() {
+        return currentPlayer instanceof net.programmierecke.radiodroid2.players.exoplayer.ExoPlayerWrapper
+                && ((net.programmierecke.radiodroid2.players.exoplayer.ExoPlayerWrapper) currentPlayer).isLocalFile();
+    }
+
+    public long getPositionMs() {
+        return isLocalFile() ? ((net.programmierecke.radiodroid2.players.exoplayer.ExoPlayerWrapper) currentPlayer).getPositionMs() : -1;
+    }
+
+    public long getDurationMs() {
+        return isLocalFile() ? ((net.programmierecke.radiodroid2.players.exoplayer.ExoPlayerWrapper) currentPlayer).getDurationMs() : -1;
     }
 
     public long getBehindLiveMs() {

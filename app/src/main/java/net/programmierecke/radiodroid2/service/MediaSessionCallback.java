@@ -66,6 +66,15 @@ public class MediaSessionCallback extends MediaSessionCompat.Callback {
     }
 
     @Override
+    public void onSeekTo(long pos) {
+        try {
+            playerService.seekTo(pos);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public void onPause() {
         try {
             playerService.Pause(PauseReason.USER);
