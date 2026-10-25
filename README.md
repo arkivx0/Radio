@@ -1,6 +1,6 @@
-# Radio — a fork of RadioDroid
+# Radio Arkiv — a fork of RadioDroid
 
-**Radio** is an unofficial fork of [RadioDroid](https://github.com/segler-alex/RadioDroid)
+**Radio Arkiv** (formerly "Radio") is an unofficial fork of [RadioDroid](https://github.com/segler-alex/RadioDroid)
 by segler-alex and contributors, an Android internet-radio app built on the free
 [Radio Browser](https://www.radio-browser.info) station directory.
 It installs alongside upstream (`applicationId io.github.arkivx0.radio`).
@@ -15,11 +15,11 @@ All credit for the app itself goes to the RadioDroid project. Licensed GPL-3.0 l
 - **Time-shift**: skip back 5 s (repeatable, up to ~5 min) and **Go live**, with a behind-live indicator.
 - **Lock-screen / media controls**: media notification with Back 5 s, Go live and Record actions.
 - **Scheduled recordings**: pick station, start time, duration, once or on repeat days.
-- **Open audio files with Radio**: recordings (`Music/Radio`) and other audio files can be opened with Radio
+- **Open audio files with Radio Arkiv**: recordings (`Music/Radio`) and other audio files can be opened with Radio Arkiv
   and play in its player with seeking, pause/resume and lock-screen controls. In the recordings list, tap to
-  play in Radio, long-press to open with another app.
+  play in Radio Arkiv, long-press to open with another app.
 - **Open file**: ⋮ → *Open audio file…* picks any audio file with the system file picker (no storage
-  permission needed) and plays it in Radio.
+  permission needed) and plays it in Radio Arkiv.
 - **Codec info line**: the full player shows the decoded source format, e.g. `AAC-LC · 44.1 kHz · stereo`.
 - **Android 13/14 fixes**: recording without legacy storage permission, exact-alarm fallback,
   notification-permission prompt, unique provider authorities, working sleep timer and alarms.
@@ -32,7 +32,7 @@ All credit for the app itself goes to the RadioDroid project. Licensed GPL-3.0 l
 - **About screen** works again and shows this fork's info.
 
 ## Install
-Download `Radio.apk` from the [Releases](../../releases) page and sideload it (allow "install unknown apps").
+Download `RadioArkiv.apk` from the [Releases](../../releases) page and sideload it (allow "install unknown apps").
 It does not replace RadioDroid. Builds are the `free` flavor (no proprietary services, no analytics).
 
 ## Known limits
