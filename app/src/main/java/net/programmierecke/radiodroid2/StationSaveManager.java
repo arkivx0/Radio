@@ -59,6 +59,20 @@ public class StationSaveManager extends Observable {
         this.stationStatusListener = stationStatusListener;
     }
 
+    // java.util.Observable ignores notifyObservers() unless setChanged() was called first,
+    // so observers (favourite star, starred list, TV channels) were never informed.
+    @Override
+    public void notifyObservers() {
+        setChanged();
+        super.notifyObservers();
+    }
+
+    @Override
+    public void notifyObservers(Object arg) {
+        setChanged();
+        super.notifyObservers(arg);
+    }
+
     public void add(DataRadioStation station) {
         if (station.queue == null)
             station.queue = this;

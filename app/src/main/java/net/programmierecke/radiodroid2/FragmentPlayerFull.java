@@ -360,6 +360,7 @@ public class FragmentPlayerFull extends Fragment {
             } else {
                 StationActions.markAsFavourite(requireContext(), station);
             }
+            updateFavouriteButton();
         });
     }
 
