@@ -32,7 +32,7 @@ public class MediaSessionCallback extends MediaSessionCompat.Callback {
     public boolean onMediaButtonEvent(Intent mediaButtonEvent) {
         final KeyEvent event = mediaButtonEvent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
 
-        if (event.getKeyCode() == KeyEvent.KEYCODE_HEADSETHOOK) {
+        if (event != null && event.getKeyCode() == KeyEvent.KEYCODE_HEADSETHOOK) {
             if (event.getAction() == KeyEvent.ACTION_UP && !event.isLongPress()) {
                 try {
                     if (playerService.isPlaying()) {
