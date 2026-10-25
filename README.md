@@ -6,6 +6,12 @@ by segler-alex and contributors, an Android internet-radio app built on the free
 It installs alongside upstream (`applicationId io.github.arkivx0.radio`).
 All credit for the app itself goes to the RadioDroid project. Licensed GPL-3.0 like upstream.
 
+<p align="center">
+  <img src="docs/screenshots/stations.png" width="250" alt="Station list" />
+  <img src="docs/screenshots/player.png" width="250" alt="Player with codec line and -5s / Live controls" />
+</p>
+<p align="center"><em>Stations shown are a random selection picked from the public directory for screenshots and testing, not an endorsement.</em></p>
+
 ## What this fork adds
 - **Incoming-call crash fix**: audio-focus loss (e.g. a call) no longer kills the service on Android 12+;
   playback pauses cleanly and resumes after the call.
