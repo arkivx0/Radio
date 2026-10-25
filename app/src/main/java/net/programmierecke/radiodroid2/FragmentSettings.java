@@ -143,6 +143,16 @@ public class FragmentSettings extends PreferenceFragmentCompat implements Shared
                     return false;
                 }
             });
+        } else if (s.equals("pref_category_recordings")) {
+            findPreference("rec_open_schedules").setOnPreferenceClickListener(preference -> {
+                startActivity(new Intent(requireContext(), net.programmierecke.radiodroid2.recording.ActivityRecordSchedules.class));
+                return true;
+            });
+            findPreference("rec_record_now_silent").setOnPreferenceClickListener(preference -> {
+                startActivity(new Intent(requireContext(), net.programmierecke.radiodroid2.recording.ActivityRecordSchedules.class)
+                        .putExtra(net.programmierecke.radiodroid2.recording.ActivityRecordSchedules.EXTRA_RECORD_NOW, true));
+                return true;
+            });
         } else if (s.equals("pref_category_other")) {
             findPreference("show_statistics").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override

@@ -181,10 +181,6 @@
     <string name="settings_recordings">Rekaman</string>
     <string name="settings_record_name_formatting">Format nama</string>
 
-    <string name="settings_record_name_formatting_default_display">stasiun_artis_jalur_\u200btanggal_\u200bwaktu</string>
-    <string name="settings_record_name_formatting_1_display">stasiun_artis_\u200bjalur</string>
-    <string name="settings_record_name_formatting_2_display">stasiun_tanggal_\u200bwaktu</string>
-    <string name="settings_record_name_formatting_3_display">indeks_stasiun_\u200btanggal</string>
 
     <string name="notify_pre_play">Menyambung</string>
     <string name="notify_play">Memutar</string>

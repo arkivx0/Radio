@@ -111,10 +111,6 @@
     <string name="settings_record_name_formatting">Formát názvu</string>
 
 
-    <string name="settings_record_name_formatting_default_display">stanica_interprét_skladba_\\200bdátum_\\200bčas</string>
-    <string name="settings_record_name_formatting_1_display">stanica_interprét_\\200bskladba</string>
-    <string name="settings_record_name_formatting_2_display">stanica_dátum_\\200bčas</string>
-    <string name="settings_record_name_formatting_3_display">index_stanica_\\200bdátum</string>
 
     <string name="notify_pre_play">Pripájanie</string>
     <string name="notify_play">Prehrávanie</string>

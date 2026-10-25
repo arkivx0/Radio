@@ -187,17 +187,17 @@
     <string name="settings_warn_no_wifi_off">No warning when not on Wi-Fi connection</string>
 
     <string name="settings_recordings">Recordings</string>
-    <string name="settings_record_name_formatting">Name format</string>
+    <string name="settings_record_name_formatting">File names</string>
 
     <string name="settings_record_name_formatting_default" translatable="false">${station}_${artist}_${track}_${date}_${time}</string>
     <string name="settings_record_name_formatting_1" translatable="false">${station}_${artist}_${track}</string>
     <string name="settings_record_name_formatting_2" translatable="false">${station}_${date}_${time}</string>
     <string name="settings_record_name_formatting_3" translatable="false">${index}_${station}_${date}</string>
 
-    <string name="settings_record_name_formatting_default_display">station_artist_track_\u200bdate_\u200btime</string>
-    <string name="settings_record_name_formatting_1_display">station_artist_\u200btrack</string>
-    <string name="settings_record_name_formatting_2_display">station_date_\u200btime</string>
-    <string name="settings_record_name_formatting_3_display">index_station_\u200bdate</string>
+    <string name="settings_record_name_formatting_default_display">Station, artist, track, date, time</string>
+    <string name="settings_record_name_formatting_1_display">Station, artist, track</string>
+    <string name="settings_record_name_formatting_2_display">Station, date, time</string>
+    <string name="settings_record_name_formatting_3_display">Number, station, date</string>
 
     <string name="notify_pre_play">Connecting</string>
     <string name="notify_play">Playing</string>
@@ -364,4 +364,13 @@
     <string name="silent_recording_title">Recording %1$s</string>
     <string name="silent_recording_text">Silent recording for %1$d min (not playing aloud)</string>
     <string name="silent_recording_stop">Stop</string>
+    <string name="settings_rec_folder">Save folder</string>
+    <string name="settings_rec_folder_summary">Music/Radio. Recordings are listed in the player\'s Recordings tab.</string>
+    <string name="settings_rec_schedules">Scheduled recordings</string>
+    <string name="settings_rec_schedules_summary">Record a station at set times, once or on repeat days</string>
+    <string name="settings_rec_now">Record now silently</string>
+    <string name="settings_rec_now_summary">Record a station in the background without playing it</string>
+    <string name="settings_rec_silent_default">Record silently by default</string>
+    <string name="settings_rec_silent_default_summary">New scheduled recordings don\'t play aloud</string>
+    <string name="open_audio_file_hint">Play a recording or any audio file on this phone</string>
 </resources>

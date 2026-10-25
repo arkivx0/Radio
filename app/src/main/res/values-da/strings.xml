@@ -182,10 +182,6 @@
     <string name="settings_recordings">Optagelser</string>
     <string name="settings_record_name_formatting">Navneformat</string>
 
-    <string name="settings_record_name_formatting_default_display">station_kunstner_nummer_\u200bdato_\u200btidspunkt</string>
-    <string name="settings_record_name_formatting_1_display">station_kunstner_\u200bnummer</string>
-    <string name="settings_record_name_formatting_2_display">station_dato_\u200btidspunkt</string>
-    <string name="settings_record_name_formatting_3_display">indeks_station_\u200bdato</string>
 
     <string name="notify_pre_play">Forbinder</string>
     <string name="notify_play">Afspiller</string>

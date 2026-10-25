@@ -121,10 +121,6 @@
     <string name="settings_record_name_formatting_2" translatable="false">${station}_${date}_${time}</string>
     <string name="settings_record_name_formatting_3" translatable="false">${index}_${station}_${date}</string>-->
 
-    <string name="settings_record_name_formatting_default_display">állomás_előadó_szám_\u200bdátum_\u200bidő</string>
-    <string name="settings_record_name_formatting_1_display">állomás_előadó_\u200bszám</string>
-    <string name="settings_record_name_formatting_2_display">állomás_dátum_\u200bidő</string>
-    <string name="settings_record_name_formatting_3_display">index_állomás_\u200bdátum</string>
 
     <string name="notify_pre_play">Kapcsolódás</string>
     <string name="notify_play">Lejátszás</string>

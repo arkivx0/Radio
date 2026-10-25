@@ -146,10 +146,6 @@
     <string name="settings_recordings">Nagrania</string>
     <string name="settings_record_name_formatting">Format nazwy</string>
 
-    <string name="settings_record_name_formatting_default_display">stacja_artysta_utwór_\u200bdate_\u200btime</string>
-    <string name="settings_record_name_formatting_1_display">stacja_artysta_\u200btrack</string>
-    <string name="settings_record_name_formatting_2_display">stacja_data_\u200btime</string>
-    <string name="settings_record_name_formatting_3_display">index_stacja_\u200bdate</string>
 	
     <string name="notify_pre_play">Łączenie</string>
     <string name="notify_play">Odtwarzanie</string>

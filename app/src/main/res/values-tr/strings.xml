@@ -116,10 +116,6 @@
     <string name="settings_recordings">Kayıtlar</string>
     <string name="settings_record_name_formatting">Ad biçimi</string>
 
-    <string name="settings_record_name_formatting_default_display">istasyon_artist_iz_\u200btarih_\u200bsaat</string>
-    <string name="settings_record_name_formatting_1_display">istasyon_artist_\u200biz</string>
-    <string name="settings_record_name_formatting_2_display">istasyon_tarih_\u200bsaat</string>
-    <string name="settings_record_name_formatting_3_display">indeks_istasyon_\u200btarih</string>
 
     <string name="notify_pre_play">Bağlanılıyor</string>
     <string name="notify_play">Oynatılıyor</string>

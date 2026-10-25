@@ -59,7 +59,30 @@ public class RecordingsAdapter extends RecyclerView.Adapter<RecordingsAdapter.Re
 
     @Override
     public void onBindViewHolder(@NonNull RecordingItemViewHolder holder, int position) {
-        final DataRecording recording = recordings.get(position);
+        if (position == 0) {
+            // Radio Arkiv: "Open audio file…" row at the top of the Recordings tab
+            holder.textViewTitle.setText(R.string.action_open_audio_file);
+            holder.textViewTitle.setContentDescription(context.getString(R.string.action_open_audio_file));
+            android.graphics.drawable.Drawable icon = androidx.core.content.ContextCompat.getDrawable(context, R.drawable.ic_folder_open_24dp);
+            if (icon != null) {
+                icon = androidx.core.graphics.drawable.DrawableCompat.wrap(icon.mutate());
+                androidx.core.graphics.drawable.DrawableCompat.setTint(icon, holder.textViewTitle.getCurrentTextColor());
+            }
+            holder.textViewTitle.setCompoundDrawablesRelativeWithIntrinsicBounds(icon, null, null, null);
+            holder.textViewTitle.setCompoundDrawablePadding(16);
+            holder.textViewTime.setText(R.string.open_audio_file_hint);
+            holder.viewRoot.setOnClickListener(v -> {
+                if (context instanceof net.programmierecke.radiodroid2.ActivityMain) {
+                    ((net.programmierecke.radiodroid2.ActivityMain) context).openAudioFilePicker();
+                }
+            });
+            holder.viewRoot.setOnLongClickListener(null);
+            return;
+        }
+        holder.textViewTitle.setCompoundDrawablesRelative(null, null, null, null);
+        holder.textViewTitle.setContentDescription(null);
+        holder.textViewTime.setText(null);
+        final DataRecording recording = recordings.get(position - 1);
 
         holder.textViewTitle.setText(recording.Name);
         //holder.textViewTime.setText(recording.Time);
@@ -97,7 +120,7 @@ public class RecordingsAdapter extends RecyclerView.Adapter<RecordingsAdapter.Re
 
     @Override
     public int getItemCount() {
-        return recordings != null ? recordings.size() : 0;
+        return 1 + (recordings != null ? recordings.size() : 0);
     }
 
     // Radio fork: tap plays the recording in Radio's own player (seekable, lock-screen controls)

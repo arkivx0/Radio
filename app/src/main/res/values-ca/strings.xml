@@ -131,10 +131,6 @@
     <string name="settings_recordings">Enregistraments</string>
     <string name="settings_record_name_formatting">Format del nom</string>
 
-    <string name="settings_record_name_formatting_default_display">emissora_artista_pista_\u200bdata_\u200btemps</string>
-    <string name="settings_record_name_formatting_1_display">emissora_artista_\u200bpista</string>
-    <string name="settings_record_name_formatting_2_display">emissora_data_\u200btemps</string>
-    <string name="settings_record_name_formatting_3_display">index_emissora_\u200bdata</string>
 
     <string name="notify_pre_play">Connectant</string>
     <string name="notify_play">Reproduint</string>

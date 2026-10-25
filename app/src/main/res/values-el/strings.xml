@@ -110,10 +110,6 @@
     <string name="settings_record_name_formatting">Μόρφωση του ονόματος</string>
 
 
-    <string name="settings_record_name_formatting_default_display">σταθμός_καλλιτέχνης_κομμάτι_\\u200bχρόνος</string>
-    <string name="settings_record_name_formatting_1_display">σταθμός_καλλιτέχνης_\\u200bκομμάτι</string>
-    <string name="settings_record_name_formatting_2_display">σταθμός_ημερομηνία_\\u200bχρόνος</string>
-    <string name="settings_record_name_formatting_3_display">περιεχόμενα_σταθμός_\\u200bημερομηνία</string>
 
     <string name="notify_pre_play">Συνδέεται</string>
     <string name="notify_play">Παίζει</string>

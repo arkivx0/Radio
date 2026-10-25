@@ -187,10 +187,6 @@
     <string name="settings_recordings">录音</string>
     <string name="settings_record_name_formatting">文件格式</string>
 
-    <string name="settings_record_name_formatting_default_display">电台_艺术家_曲目_\u200b日期_\u200b时间</string>
-    <string name="settings_record_name_formatting_1_display">电台_艺术家_\u200b曲目</string>
-    <string name="settings_record_name_formatting_2_display">电台_日期_\u200b时间</string>
-    <string name="settings_record_name_formatting_3_display">索引号_电台_\u200b日期</string>
 
     <string name="notify_pre_play">正在连接</string>
     <string name="notify_play">正在播放</string>

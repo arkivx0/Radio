@@ -187,10 +187,6 @@
   <string name="settings_record_name_formatting_2" translatable="false">${station}_${date}_${time}</string>
   <string name="settings_record_name_formatting_3" translatable="false">${index}_${station}_${date}</string>
   
-  <string name="settings_record_name_formatting_default_display">kanal_artist_spor_\u200bdato_\u200btid</string>
-  <string name="settings_record_name_formatting_1_display">kanal_artist_\u200bspor</string>
-  <string name="settings_record_name_formatting_2_display">kanal_dato_\u200btid</string>
-  <string name="settings_record_name_formatting_3_display">indeks_kanal_\u200bdato</string>
   
   <string name="notify_pre_play">Kobler til</string>
   <string name="notify_play">Spiller av</string>

@@ -182,10 +182,6 @@
     <string name="settings_recordings">Enregistrements</string>
     <string name="settings_record_name_formatting">Format du nom</string>
 
-    <string name="settings_record_name_formatting_default_display">stations_artiste_piste_\u200bdate_\u200bheure</string>
-    <string name="settings_record_name_formatting_1_display">stations_artiste_\u200bpiste</string>
-    <string name="settings_record_name_formatting_2_display">stations_date_\u200bheure</string>
-    <string name="settings_record_name_formatting_3_display">index_stations_\u200bdate</string>
 
     <string name="notify_pre_play">Connexion</string>
     <string name="notify_play">En lecture</string>

@@ -200,6 +200,24 @@
     <PreferenceScreen android:title="@string/settings_recordings"
         search:ignore="true"
         android:key="pref_category_recordings">
+        <Preference
+            android:key="rec_folder_info"
+            android:selectable="false"
+            android:title="@string/settings_rec_folder"
+            android:summary="@string/settings_rec_folder_summary" />
+        <Preference
+            android:key="rec_open_schedules"
+            android:title="@string/settings_rec_schedules"
+            android:summary="@string/settings_rec_schedules_summary" />
+        <Preference
+            android:key="rec_record_now_silent"
+            android:title="@string/settings_rec_now"
+            android:summary="@string/settings_rec_now_summary" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="rec_silent_default"
+            android:title="@string/settings_rec_silent_default"
+            android:summary="@string/settings_rec_silent_default_summary" />
         <ListPreference
             android:defaultValue="@string/settings_record_name_formatting_default"
             android:entries="@array/settings_record_name_formatting_list_display"

@@ -181,10 +181,6 @@
     <string name="settings_recordings">Gravações</string>
     <string name="settings_record_name_formatting">Formato do nome</string>
 
-    <string name="settings_record_name_formatting_default_display">rádio_artista_trilhas_u200bdata_u200bhora</string>
-    <string name="settings_record_name_formatting_1_display">rádio_artista_u200btrilhas</string>
-    <string name="settings_record_name_formatting_2_display">rádio_data_u200bhora</string>
-    <string name="settings_record_name_formatting_3_display">índice_rádio_u200bdata</string>
 
     <string name="notify_pre_play">Conectando</string>
     <string name="notify_play">Reproduzindo</string>

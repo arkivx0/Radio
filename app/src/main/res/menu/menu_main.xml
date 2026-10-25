@@ -10,6 +10,13 @@
         app:showAsAction="always" />
 
     <item
+        android:id="@+id/action_open_file_toolbar"
+        android:title="@string/action_open_audio_file"
+        android:contentDescription="@string/action_open_audio_file"
+        android:icon="@drawable/ic_folder_open_24dp"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/action_icons_view"
         android:title="@string/action_toggle_view"
         android:icon="@drawable/ic_view_icons_24dp"

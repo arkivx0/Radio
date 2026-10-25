@@ -97,10 +97,6 @@
   <string name="settings_warn_no_wifi_off">Ikkje åtvar når det manglar Wi-Fi-samband</string>
   <string name="settings_recordings">Opptak</string>
   <string name="settings_record_name_formatting">Namneformatering</string>
-  <string name="settings_record_name_formatting_default_display">kanal_artist_spor_dato_tid</string>
-  <string name="settings_record_name_formatting_1_display">kanal_artist_spor</string>
-  <string name="settings_record_name_formatting_2_display">kanal_dato_tid</string>
-  <string name="settings_record_name_formatting_3_display">indeks_kanal_dato</string>
   <string name="notify_pre_play">Koplar til</string>
   <string name="notify_play">Spelar</string>
   <string name="notify_paused">Pausa</string>

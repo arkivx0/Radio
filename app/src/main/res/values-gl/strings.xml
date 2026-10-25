@@ -187,10 +187,6 @@
     <string name="settings_record_name_formatting_2" translatable="false">${station}_${date}_${time}</string>
     <string name="settings_record_name_formatting_3" translatable="false">${index}_${station}_${date}</string>
 
-    <string name="settings_record_name_formatting_default_display">station_artist_track_\u200bdate_\u200btime</string>
-    <string name="settings_record_name_formatting_1_display">station_artist_\u200btrack</string>
-    <string name="settings_record_name_formatting_2_display">station_date_\u200btime</string>
-    <string name="settings_record_name_formatting_3_display">index_station_\u200bdate</string>
 
     <string name="notify_pre_play">Conectando</string>
     <string name="notify_play">Reproducindo</string>

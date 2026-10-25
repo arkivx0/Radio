@@ -34,6 +34,7 @@ import java.util.List;
 public class ActivityRecordSchedules extends AppCompatActivity {
     private static final String[] DAYS = {"Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"};
     private LinearLayout list;
+    public static final String EXTRA_RECORD_NOW = "record_now";
 
     @Override
     protected void attachBaseContext(android.content.Context base) {
@@ -65,6 +66,7 @@ public class ActivityRecordSchedules extends AppCompatActivity {
         root.addView(sv);
         setContentView(root);
         refresh();
+        if (getIntent().getBooleanExtra(EXTRA_RECORD_NOW, false) && b == null) showAdd(true);
     }
 
     private int dp(int v) {
@@ -147,7 +149,8 @@ public class ActivityRecordSchedules extends AppCompatActivity {
         f.addView(dur);
         CheckBox silentBox = new CheckBox(this);
         silentBox.setText("Record silently (don't play aloud)");
-        silentBox.setChecked(true);
+        silentBox.setChecked(androidx.preference.PreferenceManager.getDefaultSharedPreferences(this)
+                .getBoolean("rec_silent_default", true));
         if (!recordNow) f.addView(silentBox);
         TextView repeatLabel = text("Repeat (none = once):", 12);
         if (!recordNow) f.addView(repeatLabel);

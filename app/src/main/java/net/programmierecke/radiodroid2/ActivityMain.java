@@ -861,26 +861,30 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
         startActivityForResult(intent, ACTION_LOAD_FILE);
     }
 
+    /** Radio Arkiv: system file picker for audio (no storage permission needed). */
+    public void openAudioFilePicker() {
+        Intent pick = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        pick.addCategory(Intent.CATEGORY_OPENABLE);
+        pick.setType("audio/*");
+        pick.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"audio/*", "application/ogg", "application/x-ogg"});
+        pick.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+        try {
+            startActivityForResult(pick, ACTION_OPEN_AUDIO_FILE);
+        } catch (android.content.ActivityNotFoundException e) {
+            Toast.makeText(this, R.string.error_no_file_picker, Toast.LENGTH_SHORT).show();
+        }
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case android.R.id.home:
                 mDrawerLayout.openDrawer(GravityCompat.START);  // OPEN DRAWER
                 return true;
-            case R.id.action_open_file: {
-                // Radio fork: system file picker, no storage permission needed
-                Intent pick = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-                pick.addCategory(Intent.CATEGORY_OPENABLE);
-                pick.setType("audio/*");
-                pick.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"audio/*", "application/ogg", "application/x-ogg"});
-                pick.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
-                try {
-                    startActivityForResult(pick, ACTION_OPEN_AUDIO_FILE);
-                } catch (android.content.ActivityNotFoundException e) {
-                    Toast.makeText(this, R.string.error_no_file_picker, Toast.LENGTH_SHORT).show();
-                }
+            case R.id.action_open_file:
+            case R.id.action_open_file_toolbar:
+                openAudioFilePicker();
                 return true;
-            }
             case R.id.action_record_schedules:
                 startActivity(new Intent(this, net.programmierecke.radiodroid2.recording.ActivityRecordSchedules.class));
                 return true;

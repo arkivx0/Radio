@@ -181,10 +181,6 @@
     <string name="settings_recordings">Registrazioni</string>
     <string name="settings_record_name_formatting">Formato del nome</string>
 
-    <string name="settings_record_name_formatting_default_display">stazione_artista_traccia_\u200bdata_\u200bora</string>
-    <string name="settings_record_name_formatting_1_display">stazione_artista_\u200btraccia</string>
-    <string name="settings_record_name_formatting_2_display">stazione_data_\u200bora</string>
-    <string name="settings_record_name_formatting_3_display">indice_stazione_\u200bdata</string>
 
     <string name="notify_pre_play">Connettendo</string>
     <string name="notify_play">Riproducendo</string>
