@@ -18,6 +18,8 @@ All credit for the app itself goes to the RadioDroid project. Licensed GPL-3.0 l
 - **Open audio files with Radio**: recordings (`Music/Radio`) and other audio files can be opened with Radio
   and play in its player with seeking, pause/resume and lock-screen controls. In the recordings list, tap to
   play in Radio, long-press to open with another app.
+- **Open file**: ⋮ → *Open audio file…* picks any audio file with the system file picker (no storage
+  permission needed) and plays it in Radio.
 - **Codec info line**: the full player shows the decoded source format, e.g. `AAC-LC · 44.1 kHz · stereo`.
 - **Android 13/14 fixes**: recording without legacy storage permission, exact-alarm fallback,
   notification-permission prompt, unique provider authorities, working sleep timer and alarms.
