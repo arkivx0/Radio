@@ -258,6 +258,12 @@
     <string name="player_info_transferred">Transferred data: %1$s</string>
     <string name="player_info_recording_to">Recording to:\n%1$s</string>
     <string name="player_info_recorded_to">Last recording:\n%1$s</string>
+    <string name="player_audio_format_mono">mono</string>
+    <string name="player_audio_format_stereo">stereo</string>
+    <plurals name="player_audio_format_channels">
+        <item quantity="one">%1$d channel</item>
+        <item quantity="other">%1$d channels</item>
+    </plurals>
 
     <string name="tab_player_art">Album art</string>
     <string name="tab_player_info">Info</string>

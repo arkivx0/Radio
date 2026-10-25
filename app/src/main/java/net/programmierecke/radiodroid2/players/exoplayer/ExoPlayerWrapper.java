@@ -18,12 +18,14 @@ import androidx.preference.PreferenceManager;
 
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.analytics.AnalyticsListener;
 import com.google.android.exoplayer2.audio.AudioAttributes;
+import com.google.android.exoplayer2.decoder.DecoderReuseEvaluation;
 import com.google.android.exoplayer2.metadata.Metadata;
 import com.google.android.exoplayer2.metadata.icy.IcyHeaders;
 import com.google.android.exoplayer2.metadata.icy.IcyInfo;
@@ -77,6 +79,9 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
 
     private Runnable fullStopTask;
 
+    private final Object streamInfoLock = new Object();
+    private ShoutcastInfo streamAudioInfo;
+
     private final BroadcastReceiver networkChangedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -102,6 +107,7 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
 
         this.context = context;
         this.streamUrl = streamUrl;
+        isHls = Utils.urlIndicatesHlsStream(streamUrl);
 
         cancelStopTask();
 
@@ -110,6 +116,11 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
         if (player != null) {
             player.stop();
         }
+
+        synchronized (streamInfoLock) {
+            streamAudioInfo = null;
+        }
+        stateListener.onDataSourceShoutcastInfo(null, isHls);
 
         if (player == null) {
             player = new ExoPlayer.Builder(context).build();
@@ -123,8 +134,6 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
         if (playerThreadHandler == null) {
             playerThreadHandler = new Handler(Looper.getMainLooper());
         }
-
-        isHls = Utils.urlIndicatesHlsStream(streamUrl);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
         final int retryTimeout = prefs.getInt("settings_retry_timeout", 10);
@@ -351,7 +360,48 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
 
     @Override
     public void onDataSourceShoutcastInfo(@Nullable ShoutcastInfo shoutcastInfo) {
-        stateListener.onDataSourceShoutcastInfo(shoutcastInfo, false);
+        ShoutcastInfo publishedInfo;
+        synchronized (streamInfoLock) {
+            if (shoutcastInfo != null) {
+                if (streamAudioInfo == null) {
+                    streamAudioInfo = new ShoutcastInfo();
+                }
+                streamAudioInfo.mergeFrom(shoutcastInfo);
+            }
+            publishedInfo = streamAudioInfo != null && streamAudioInfo.hasUsefulInfo()
+                    ? new ShoutcastInfo(streamAudioInfo)
+                    : null;
+        }
+        stateListener.onDataSourceShoutcastInfo(publishedInfo, isHls);
+    }
+
+    private void onObservedAudioFormat(@NonNull Format format) {
+        int bitrateBitsPerSecond = format.averageBitrate > 0
+                ? format.averageBitrate
+                : format.bitrate;
+
+        ShoutcastInfo publishedInfo;
+        synchronized (streamInfoLock) {
+            if (streamAudioInfo == null) {
+                streamAudioInfo = new ShoutcastInfo();
+            }
+            streamAudioInfo.mergeObservedAudioFormat(
+                    format.sampleMimeType,
+                    format.codecs,
+                    format.sampleRate,
+                    format.channelCount,
+                    bitrateBitsPerSecond);
+            publishedInfo = new ShoutcastInfo(streamAudioInfo);
+        }
+
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "Source audio format: mime=" + format.sampleMimeType
+                    + ", codecs=" + format.codecs
+                    + ", sampleRate=" + format.sampleRate
+                    + ", channels=" + format.channelCount
+                    + ", averageBitrate=" + format.averageBitrate);
+        }
+        stateListener.onDataSourceShoutcastInfo(publishedInfo, isHls);
     }
 
     @Override
@@ -475,6 +525,12 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
     }
 
     private class AnalyticEventListener implements AnalyticsListener {
+        @Override
+        public void onAudioInputFormatChanged(@NonNull EventTime eventTime, @NonNull Format format,
+                                              @Nullable DecoderReuseEvaluation decoderReuseEvaluation) {
+            onObservedAudioFormat(format);
+        }
+
         @Override
         public void onPlayerStateChanged(EventTime eventTime, boolean playWhenReady, int playbackState) {
             isPlayingFlag = playbackState == Player.STATE_READY || playbackState == Player.STATE_BUFFERING;

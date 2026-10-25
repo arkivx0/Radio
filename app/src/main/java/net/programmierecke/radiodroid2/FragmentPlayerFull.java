@@ -63,6 +63,8 @@ import net.programmierecke.radiodroid2.views.RecyclerAwareNestedScrollView;
 import net.programmierecke.radiodroid2.views.TagsView;
 
 import java.lang.ref.WeakReference;
+import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -118,6 +120,7 @@ public class FragmentPlayerFull extends Fragment {
     private TextView textViewTimePlayed;
     private TextView textViewNetworkUsageInfo;
     private TextView textViewTimeCached;
+    private TextView textViewSourceAudioInfo;
 
     private Group groupRecordings;
     private ImageView imgRecordingIcon;
@@ -226,6 +229,7 @@ public class FragmentPlayerFull extends Fragment {
         textViewTimePlayed = view.findViewById(R.id.textViewTimePlayed);
         textViewNetworkUsageInfo = view.findViewById(R.id.textViewNetworkUsageInfo);
         textViewTimeCached = view.findViewById(R.id.textViewTimeCached);
+        textViewSourceAudioInfo = view.findViewById(R.id.textViewSourceAudioInfo);
 
         groupRecordings = view.findViewById(R.id.group_recording_info);
         imgRecordingIcon = view.findViewById(R.id.imgRecordingIcon);
@@ -457,11 +461,10 @@ public class FragmentPlayerFull extends Fragment {
 
     private void fullUpdate() {
         DataRadioStation station = Utils.getCurrentOrLastStation(requireContext());
+        final ShoutcastInfo shoutcastInfo = PlayerServiceUtil.getShoutcastInfo();
+        updateSourceAudioInfo(shoutcastInfo);
 
         if (station != null) {
-            final ShoutcastInfo shoutcastInfo = PlayerServiceUtil.getShoutcastInfo();
-            // TODO: add some of shoutcast info
-
             final StreamLiveInfo liveInfo = PlayerServiceUtil.getMetadataLive();
             String streamTitle = liveInfo.getTitle();
 
@@ -501,6 +504,37 @@ public class FragmentPlayerFull extends Fragment {
         timedUpdateTask.run();
 
         initialized = true;
+    }
+
+    private void updateSourceAudioInfo(@Nullable ShoutcastInfo shoutcastInfo) {
+        List<String> details = new ArrayList<>();
+        if (shoutcastInfo != null) {
+            String codecName = shoutcastInfo.getCodecDisplayName();
+            if (!TextUtils.isEmpty(codecName)) {
+                details.add(codecName);
+            }
+
+            if (shoutcastInfo.sampleRate > 0) {
+                NumberFormat sampleRateFormat = NumberFormat.getNumberInstance();
+                sampleRateFormat.setMaximumFractionDigits(3);
+                details.add(sampleRateFormat.format(shoutcastInfo.sampleRate / 1000d) + " kHz");
+            }
+
+            if (shoutcastInfo.channels == 1) {
+                details.add(getString(R.string.player_audio_format_mono));
+            } else if (shoutcastInfo.channels == 2) {
+                details.add(getString(R.string.player_audio_format_stereo));
+            } else if (shoutcastInfo.channels > 2) {
+                details.add(getResources().getQuantityString(
+                        R.plurals.player_audio_format_channels,
+                        shoutcastInfo.channels,
+                        shoutcastInfo.channels));
+            }
+        }
+
+        String description = TextUtils.join(" \u00b7 ", details);
+        textViewSourceAudioInfo.setText(description);
+        textViewSourceAudioInfo.setVisibility(description.isEmpty() ? View.GONE : View.VISIBLE);
     }
 
     private void updatePlaybackButtons(boolean playing, boolean recording) {

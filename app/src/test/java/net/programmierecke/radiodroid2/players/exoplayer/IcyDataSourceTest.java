@@ -77,6 +77,20 @@ class IcyDataSourceTest {
         assertEquals(0, icyDataSource.metadataBytesToSkip);
     }
 
+    @Test
+    void sendToDataSourceListenersWithoutMetadata_passesThroughStreamsWithoutMetadata() {
+        final byte[] buffer = "plain audio stream".getBytes();
+        icyDataSource.shoutcastInfo.metadataOffset = 0;
+        icyDataSource.remainingUntilMetadata = Integer.MAX_VALUE;
+        icyDataSource.metadataBytesToSkip = 0;
+
+        icyDataSource.sendToDataSourceListenersWithoutMetadata(buffer, 0, buffer.length);
+
+        assertEquals("plain audio stream", transferredBytesWithoutMetadata.toString());
+        assertEquals(Integer.MAX_VALUE - buffer.length, icyDataSource.remainingUntilMetadata);
+        assertEquals(0, icyDataSource.metadataBytesToSkip);
+    }
+
     static class TestDataSourceListener implements IcyDataSource.IcyDataSourceListener {
 
         @Override

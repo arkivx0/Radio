@@ -247,6 +247,12 @@
     <string name="player_info_transferred">Dados transferidos: %1$s</string>
     <string name="player_info_recording_to">Gravando a :\n%1$s</string>
     <string name="player_info_recorded_to">Última gravação:\n%1$s</string>
+    <string name="player_audio_format_mono">mono</string>
+    <string name="player_audio_format_stereo">estéreo</string>
+    <plurals name="player_audio_format_channels">
+        <item quantity="one">%1$d canal</item>
+        <item quantity="other">%1$d canais</item>
+    </plurals>
 
     <string name="tab_player_art">Arte do álbum</string>
     <string name="tab_player_info">Info</string>

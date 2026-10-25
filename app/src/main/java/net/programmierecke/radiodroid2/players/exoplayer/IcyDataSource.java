@@ -160,7 +160,7 @@ public class IcyDataSource implements HttpDataSource {
             dataSourceListener.onDataSourceShoutcastInfo(shoutcastInfo);
 
             metadataBytesToSkip = 0;
-            if (shoutcastInfo != null) {
+            if (shoutcastInfo != null && shoutcastInfo.hasMetadata()) {
                 remainingUntilMetadata = shoutcastInfo.metadataOffset;
             } else {
                 remainingUntilMetadata = Integer.MAX_VALUE;

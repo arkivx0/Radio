@@ -73,7 +73,7 @@ public class StreamProxy implements Recordable {
         if (info != null) {
             callback.onFoundShoutcastStream(info, false);
             bytesUntilMetaData = info.metadataOffset;
-            streamHasMetaData = true;
+            streamHasMetaData = info.hasMetadata();
         }
 
         InputStream inputStream = responseBody.byteStream();

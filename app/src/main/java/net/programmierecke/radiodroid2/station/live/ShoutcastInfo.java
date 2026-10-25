@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import com.google.android.exoplayer2.metadata.icy.IcyHeaders;
 
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import okhttp3.Response;
@@ -34,11 +35,21 @@ public class ShoutcastInfo implements Parcelable {
     public int channels;
     public int sampleRate;
 
+    // Decoder-observed source format. These values describe the compressed
+    // stream presented to the player, not Android's final hardware output.
+    public String sampleMimeType;
+    public String codecs;
+
     public ShoutcastInfo() {
     }
 
+    public ShoutcastInfo(ShoutcastInfo other) {
+        mergeFrom(other);
+    }
+
     public ShoutcastInfo(IcyHeaders icyHeaders) {
-        this.bitrate = icyHeaders.bitrate;
+        this.metadataOffset = Math.max(icyHeaders.metadataInterval, 0);
+        this.bitrate = bitsPerSecondToKbps(icyHeaders.bitrate);
         this.audioGenre = icyHeaders.genre;
         this.serverPublic = icyHeaders.isPublic;
         this.audioName = icyHeaders.name;
@@ -81,12 +92,7 @@ public class ShoutcastInfo implements Parcelable {
             }
         }
 
-        // info needs at least metadataoffset
-        if (info.metadataOffset == 0) {
-            return null;
-        }
-
-        return info;
+        return info.hasUsefulInfo() ? info : null;
     }
 
     private static Map<String, String> splitAudioInfo(String audioInfo) {
@@ -94,9 +100,116 @@ public class ShoutcastInfo implements Parcelable {
         String[] pairs = audioInfo.split(";");
         for (String pair : pairs) {
             int idx = pair.indexOf("=");
-            params.put(pair.substring(0, idx), pair.substring(idx + 1));
+            if (idx <= 0) {
+                continue;
+            }
+
+            String key = pair.substring(0, idx).trim().toLowerCase(Locale.US);
+            if (key.isEmpty()) {
+                continue;
+            }
+
+            params.put(key, pair.substring(idx + 1).trim());
         }
         return params;
+    }
+
+    public boolean hasMetadata() {
+        return metadataOffset > 0;
+    }
+
+    public boolean hasUsefulInfo() {
+        return hasMetadata()
+                || bitrate > 0
+                || channels > 0
+                || sampleRate > 0
+                || isNonEmpty(audioInfo)
+                || isNonEmpty(audioDesc)
+                || isNonEmpty(audioGenre)
+                || isNonEmpty(audioName)
+                || isNonEmpty(audioHomePage)
+                || isNonEmpty(serverName)
+                || isNonEmpty(sampleMimeType)
+                || isNonEmpty(codecs);
+    }
+
+    public void mergeFrom(ShoutcastInfo other) {
+        if (other == null) {
+            return;
+        }
+
+        if (other.metadataOffset > 0) metadataOffset = other.metadataOffset;
+        if (other.bitrate > 0) bitrate = other.bitrate;
+        if (isNonEmpty(other.audioInfo)) audioInfo = other.audioInfo;
+        if (isNonEmpty(other.audioDesc)) audioDesc = other.audioDesc;
+        if (isNonEmpty(other.audioGenre)) audioGenre = other.audioGenre;
+        if (isNonEmpty(other.audioName)) audioName = other.audioName;
+        if (isNonEmpty(other.audioHomePage)) audioHomePage = other.audioHomePage;
+        if (isNonEmpty(other.serverName)) serverName = other.serverName;
+        serverPublic = serverPublic || other.serverPublic;
+        if (other.channels > 0) channels = other.channels;
+        if (other.sampleRate > 0) sampleRate = other.sampleRate;
+        if (isNonEmpty(other.sampleMimeType)) sampleMimeType = other.sampleMimeType;
+        if (isNonEmpty(other.codecs)) codecs = other.codecs;
+    }
+
+    public void mergeObservedAudioFormat(String sampleMimeType, String codecs, int sampleRate,
+                                         int channels, int bitrateBitsPerSecond) {
+        if (isNonEmpty(sampleMimeType)) this.sampleMimeType = sampleMimeType;
+        if (isNonEmpty(codecs)) this.codecs = codecs;
+        if (sampleRate > 0) this.sampleRate = sampleRate;
+        if (channels > 0) this.channels = channels;
+        if (bitrate <= 0) bitrate = bitsPerSecondToKbps(bitrateBitsPerSecond);
+    }
+
+    public String getCodecDisplayName() {
+        if (isNonEmpty(codecs)) {
+            String normalizedCodecs = codecs.trim().toLowerCase(Locale.US);
+            if (normalizedCodecs.startsWith("mp4a.40.29")) return "HE-AAC v2";
+            if (normalizedCodecs.startsWith("mp4a.40.5")) return "HE-AAC";
+            if (normalizedCodecs.startsWith("mp4a.40.2")) return "AAC-LC";
+            if (normalizedCodecs.startsWith("opus")) return "Opus";
+            if (normalizedCodecs.startsWith("vorbis")) return "Vorbis";
+            if (normalizedCodecs.startsWith("flac")) return "FLAC";
+            if (normalizedCodecs.startsWith("mp3")) return "MP3";
+        }
+
+        if (isNonEmpty(sampleMimeType)) {
+            String normalizedMimeType = sampleMimeType.trim().toLowerCase(Locale.US);
+            switch (normalizedMimeType) {
+                case "audio/mp4a-latm":
+                case "audio/aac":
+                    return "AAC";
+                case "audio/mpeg":
+                    return "MP3";
+                case "audio/mpeg-l1":
+                    return "MP1";
+                case "audio/mpeg-l2":
+                    return "MP2";
+                case "audio/opus":
+                    return "Opus";
+                case "audio/vorbis":
+                    return "Vorbis";
+                case "audio/flac":
+                    return "FLAC";
+                case "audio/ac3":
+                    return "AC-3";
+                case "audio/eac3":
+                    return "E-AC-3";
+                default:
+                    return sampleMimeType;
+            }
+        }
+
+        return isNonEmpty(codecs) ? codecs : null;
+    }
+
+    private static int bitsPerSecondToKbps(int bitsPerSecond) {
+        return bitsPerSecond > 0 ? Math.round(bitsPerSecond / 1000f) : 0;
+    }
+
+    private static boolean isNonEmpty(String value) {
+        return value != null && !value.trim().isEmpty();
     }
 
     protected ShoutcastInfo(Parcel in) {
@@ -111,6 +224,8 @@ public class ShoutcastInfo implements Parcelable {
         serverPublic = in.readByte() != 0;
         channels = in.readInt();
         sampleRate = in.readInt();
+        sampleMimeType = in.readString();
+        codecs = in.readString();
     }
 
     @Override
@@ -126,6 +241,8 @@ public class ShoutcastInfo implements Parcelable {
         dest.writeByte((byte) (serverPublic ? 1 : 0));
         dest.writeInt(channels);
         dest.writeInt(sampleRate);
+        dest.writeString(sampleMimeType);
+        dest.writeString(codecs);
     }
 
     @Override

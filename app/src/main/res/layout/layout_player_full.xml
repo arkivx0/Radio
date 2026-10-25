@@ -135,6 +135,21 @@
                 app:layout_constraintTop_toBottomOf="@+id/space"
                 tools:text="-10s" />
 
+            <TextView
+                android:id="@+id/textViewSourceAudioInfo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="16dp"
+                android:gravity="center"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textViewTimeCached"
+                tools:text="AAC-LC · 44.1 kHz · stereo"
+                tools:visibility="visible" />
+
             <View
                 android:id="@+id/divider1"
                 android:layout_width="match_parent"
@@ -142,7 +157,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
                 android:background="?android:attr/dividerVertical"
-                app:layout_constraintTop_toBottomOf="@+id/textViewTimeCached" />
+                app:layout_constraintTop_toBottomOf="@+id/textViewSourceAudioInfo" />
 
             <ImageView
                 android:id="@+id/imgRecordingIcon"
