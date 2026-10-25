@@ -64,6 +64,8 @@ public class StationsFilter extends CustomFilter {
     private List<DataRadioStation> filteredStationsList;
     private SearchStatus lastRemoteSearchStatus = SearchStatus.SUCCESS;
 
+    private static final int MAX_NAME_SEARCH_RESULTS = 1000;
+
     private SearchStyle searchStyle = SearchStyle.ByName;
 
     private class WeightedStation {
@@ -110,6 +112,9 @@ public class StationsFilter extends CustomFilter {
             switch (searchStyle){
                 case ByName:
                     searchUrl = "json/stations/byname/" + queryEncoded;
+                    // Short, common substrings (e.g. "rad") match tens of thousands of stations
+                    // and the app ran out of memory. Results are sorted by popularity, so cap them.
+                    p.put("limit", "" + MAX_NAME_SEARCH_RESULTS);
                     break;
                 case ByCountryCodeExact:
                     searchUrl = "json/stations/bycountrycodeexact/" + queryEncoded;
