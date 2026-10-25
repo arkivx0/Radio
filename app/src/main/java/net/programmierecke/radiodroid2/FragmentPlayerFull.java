@@ -454,14 +454,14 @@ public class FragmentPlayerFull extends Fragment {
     /** After a time-shift tap: check the 1 s timer is alive and refresh soon. */
     private void afterShiftTap() {
         long since = System.currentTimeMillis() - lastTickMs;
-        android.util.Log.i(SKIP_LOG, "ui tap: updating=" + updating + " hidden=" + isHidden()
+        android.util.Log.d(SKIP_LOG, "ui tap: updating=" + updating + " hidden=" + isHidden()
                 + " lastTickAgoMs=" + since + " playing=" + PlayerServiceUtil.isPlaying()
                 + " state=" + PlayerServiceUtil.getPlayerState());
         if (updating && since > 3 * TIMED_UPDATE_INTERVAL) {
-            android.util.Log.w(SKIP_LOG, "ui timer was stalled, restarting it");
+            android.util.Log.d(SKIP_LOG, "ui timer was stalled, restarting it");
             refreshHandler.executePeriodically(timedUpdateTask, TIMED_UPDATE_INTERVAL);
         } else if (!updating && getView() != null && !isHidden()) {
-            android.util.Log.w(SKIP_LOG, "ui was not updating while visible, starting");
+            android.util.Log.d(SKIP_LOG, "ui was not updating while visible, starting");
             startUpdating();
         }
         uiHandler.postDelayed(() -> { if (getView() != null) timedUpdateTask.run(); }, 300);

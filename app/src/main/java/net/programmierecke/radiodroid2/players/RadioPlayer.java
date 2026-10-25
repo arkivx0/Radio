@@ -153,9 +153,26 @@ public class RadioPlayer implements PlayerWrapper.PlayListener, Recordable {
 
     public void seekTo(final long positionMs) {
         playerThreadHandler.post(() -> {
-            if (currentPlayer instanceof net.programmierecke.radiodroid2.players.exoplayer.ExoPlayerWrapper)
-                ((net.programmierecke.radiodroid2.players.exoplayer.ExoPlayerWrapper) currentPlayer).seekTo(positionMs);
+            if (currentPlayer instanceof net.programmierecke.radiodroid2.players.exoplayer.ExoPlayerWrapper) {
+                net.programmierecke.radiodroid2.players.exoplayer.ExoPlayerWrapper p =
+                        (net.programmierecke.radiodroid2.players.exoplayer.ExoPlayerWrapper) currentPlayer;
+                if (p.isLocalFile()) p.seekTo(positionMs); else p.seekInTimeShift(positionMs);
+            }
         });
+    }
+
+    /** Time-shift span (ms) for a live stream, -1 if none. */
+    public long getTimeShiftSpanMs() {
+        if (currentPlayer instanceof net.programmierecke.radiodroid2.players.exoplayer.ExoPlayerWrapper)
+            return ((net.programmierecke.radiodroid2.players.exoplayer.ExoPlayerWrapper) currentPlayer).getTimeShiftSpanMs();
+        return -1;
+    }
+
+    /** Playhead within the time-shift span (ms), -1 if none. */
+    public long getTimeShiftPositionMs() {
+        if (currentPlayer instanceof net.programmierecke.radiodroid2.players.exoplayer.ExoPlayerWrapper)
+            return ((net.programmierecke.radiodroid2.players.exoplayer.ExoPlayerWrapper) currentPlayer).getTimeShiftPositionMs();
+        return -1;
     }
 
     public boolean isLocalFile() {

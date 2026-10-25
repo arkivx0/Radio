@@ -84,7 +84,7 @@ public class TimeShiftBuffer {
     /** Bitrate seen by the decoder (more reliable than the directory's value). */
     public synchronized void setBitrateKbps(int kbps) {
         if (kbps > 0 && Math.abs(kbps * 125.0 - knownBytesPerSecond) > 1) {
-            Log.i(LOG, "bitrate " + (knownBytesPerSecond / 125.0) + " -> " + kbps + " kbps");
+            Log.d(LOG, "bitrate " + (knownBytesPerSecond / 125.0) + " -> " + kbps + " kbps");
             // keep live where it is when the rate changes
             if (liveAnchorPos >= 0) {
                 long now = clock.nowMs();
@@ -146,7 +146,7 @@ public class TimeShiftBuffer {
                 try { src.close(); } catch (Exception ignored) { }
             }
             if (!stopped) {
-                Log.i(LOG, "stream reconnect (partial frame dropped)");
+                Log.d(LOG, "stream reconnect (partial frame dropped)");
                 try { Thread.sleep(1000); } catch (InterruptedException ignored) { }
             }
         }
@@ -203,7 +203,7 @@ public class TimeShiftBuffer {
                         if (len - p > keep) { dropped += len - keep - p; p = len - keep; }
                         break;
                     }
-                    if (sync > p) Log.i(LOG, "framer: skipped " + (sync - p) + " non-audio bytes");
+                    if (sync > p) Log.d(LOG, "framer: skipped " + (sync - p) + " non-audio bytes");
                     dropped += sync - p;
                     p = sync;
                     synced = true;
@@ -212,7 +212,7 @@ public class TimeShiftBuffer {
             }
             if (p > 0) { System.arraycopy(pend, p, pend, 0, len - p); len -= p; }
             if (mode == 0 && detectSeen > DETECT_LIMIT) {
-                Log.i(LOG, "framer: not MPEG/ADTS, passing through");
+                Log.d(LOG, "framer: not MPEG/ADTS, passing through");
                 mode = 2;
                 write(pend, 0, len);
                 len = 0;
@@ -247,7 +247,7 @@ public class TimeShiftBuffer {
             long room = writableNow();
             if (room <= 0) {
                 if (!logged) {
-                    Log.i(LOG, "backpressure: read-ahead full, written=" + written + " readerPos=" + readerPos);
+                    Log.d(LOG, "backpressure: read-ahead full, written=" + written + " readerPos=" + readerPos);
                     logged = true;
                 }
                 wait(500);
@@ -299,7 +299,7 @@ public class TimeShiftBuffer {
         liveAnchorPos = playhead(playedMs);
         liveAnchorTime = clock.nowMs();
         anchorPending = false;
-        Log.i(LOG, "live anchored at " + liveAnchorPos + " (written=" + written + ")");
+        Log.d(LOG, "live anchored at " + liveAnchorPos + " (written=" + written + ")");
     }
 
     /** Where an uninterrupted player would be now (see class doc). */
@@ -315,6 +315,36 @@ public class TimeShiftBuffer {
     /** Skip-back history available behind the playhead, in ms. */
     public synchronized long historyMs(long playedMs) {
         return ms(playhead(playedMs) - oldest());
+    }
+
+    /** Oldest byte the playhead may move to: retained in the ring and within the max offset. */
+    private long seekStart(long live) {
+        return Math.max(oldest(), live - bytes(maxBehindMs));
+    }
+
+    /** Seekable span for the media session: oldest usable audio up to live, in ms. */
+    public synchronized long spanMs(long playedMs) {
+        long live = live(playedMs);
+        return ms(Math.max(0, live - seekStart(live)));
+    }
+
+    /** Playhead within {@link #spanMs}, in ms. */
+    public synchronized long positionInSpanMs(long playedMs) {
+        long live = live(playedMs);
+        return ms(Math.max(0, playhead(playedMs) - seekStart(live)));
+    }
+
+    /**
+     * Delta for {@link #shift} that moves the playhead to posMs within the span (clamped);
+     * Long.MIN_VALUE when that is within a second of live.
+     */
+    public synchronized long deltaForSpanPosition(long playedMs, long posMs) {
+        long live = live(playedMs);
+        long start = seekStart(live);
+        long target = Math.max(start, Math.min(live, start + bytes(Math.max(0, posMs))));
+        if (live - target < bytes(1000)) return Long.MIN_VALUE;
+        long d = ms(playhead(playedMs) - target);
+        return d == 0 ? 1 : d; // never 0, and Long.MIN_VALUE is reserved for live
     }
 
     /**
@@ -340,7 +370,7 @@ public class TimeShiftBuffer {
         startPos = target;
         if (anchorPending && deltaMs != Long.MIN_VALUE) { liveAnchorPos = head; liveAnchorTime = now; }
         anchorPending = deltaMs == Long.MIN_VALUE; // Go live re-anchors when sound starts
-        Log.i(LOG, "shift delta=" + deltaMs + " ring=" + capacity + " written=" + written
+        Log.d(LOG, "shift delta=" + deltaMs + " ring=" + capacity + " written=" + written
                 + " oldest=" + oldest() + " playedMs=" + playedMs + " playhead=" + head + " live=" + live
                 + " bps=" + (long) bytesPerSecond() + " target=" + target
                 + " offset " + ms(live - head) + " -> " + ms(live - target) + " ms");
@@ -377,7 +407,7 @@ public class TimeShiftBuffer {
         generation++;
         readerPos = target;
         startPos = target;
-        Log.w(LOG, "recover after decoder error: playhead=" + head + " -> " + target + " written=" + written
+        Log.d(LOG, "recover after decoder error: playhead=" + head + " -> " + target + " written=" + written
                 + " droppedBytes=" + framer.dropped);
         notifyAll();
         return ms(Math.max(0, live - target));
@@ -405,7 +435,7 @@ public class TimeShiftBuffer {
                 gen = generation;
                 pos = Math.max(oldest(), startPos + Math.max(0, dataSpec.position));
                 readerPos = pos;
-                Log.i(LOG, "reader open: startPos=" + startPos + " written=" + written + " pos=" + pos
+                Log.d(LOG, "reader open: startPos=" + startPos + " written=" + written + " pos=" + pos
                         + " oldest=" + oldest());
                 TimeShiftBuffer.this.notifyAll();
             }

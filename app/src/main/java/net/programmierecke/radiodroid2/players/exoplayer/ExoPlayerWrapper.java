@@ -270,7 +270,7 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
         // read-ahead. Using only the last requested shift made Back 5s land near the live edge.
         long played = Math.max(0, player.getCurrentPosition());
         shiftMs = timeShift.shift(played, deltaMs);
-        Log.i(TimeShiftBuffer.LOG, "tap delta=" + deltaMs + " playerPositionMs=" + played
+        Log.d(TimeShiftBuffer.LOG, "tap delta=" + deltaMs + " playerPositionMs=" + played
                 + " playerBufferedMs=" + (player.getBufferedPosition() - player.getCurrentPosition())
                 + " readerPos=" + timeShift.readerPos() + " written=" + timeShift.written()
                 + " newOffsetMs=" + shiftMs);
@@ -299,11 +299,11 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
         long now = System.currentTimeMillis();
         while (!recoveries.isEmpty() && now - recoveries.peekFirst() > 60_000) recoveries.removeFirst();
         if (recoveries.size() >= 5) {
-            Log.w(TimeShiftBuffer.LOG, "too many decoder errors, giving up: " + error.getErrorCodeName());
+            Log.d(TimeShiftBuffer.LOG, "too many decoder errors, giving up: " + error.getErrorCodeName());
             return false;
         }
         recoveries.addLast(now);
-        Log.w(TimeShiftBuffer.LOG, "decoder/parser error " + error.getErrorCodeName() + ", recovering", error);
+        Log.d(TimeShiftBuffer.LOG, "decoder/parser error " + error.getErrorCodeName() + ", recovering", error);
         final long played = Math.max(0, player.getCurrentPosition());
         playerThreadHandler.post(() -> {
             if (!canTimeShift()) return;
@@ -315,6 +315,29 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
             player.setPlayWhenReady(true);
         });
         return true;
+    }
+
+    /** Seekable time-shift span in ms (oldest kept audio to live), or -1 when not available. */
+    public long getTimeShiftSpanMs() {
+        if (!canTimeShift() || localFile) return -1;
+        return timeShift.spanMs(Math.max(0, player.getCurrentPosition()));
+    }
+
+    /** Playhead within {@link #getTimeShiftSpanMs()}, in ms. */
+    public long getTimeShiftPositionMs() {
+        if (!canTimeShift() || localFile) return -1;
+        long span = getTimeShiftSpanMs();
+        // While re-preparing the player position restarts at 0; use the offset just set.
+        if (shifting) return Math.max(0, span - shiftMs);
+        return Math.min(span, timeShift.positionInSpanMs(Math.max(0, player.getCurrentPosition())));
+    }
+
+    /** Move the playhead to positionMs within the time-shift span; the end means live. Player thread. */
+    public void seekInTimeShift(long positionMs) {
+        if (!canTimeShift() || localFile) return;
+        long delta = timeShift.deltaForSpanPosition(Math.max(0, player.getCurrentPosition()), positionMs);
+        if (delta == Long.MIN_VALUE && getBehindLiveMs() == 0) return; // already live
+        shiftBy(delta);
     }
 
     public long getBehindLiveMs() {
@@ -679,7 +702,7 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
                 if (playbackState == Player.STATE_READY) {
                     shifting = false;
                     cancelStopTask();
-                    Log.i(TimeShiftBuffer.LOG, "re-prepared after shift, behind=" + shiftMs + " ms");
+                    Log.d(TimeShiftBuffer.LOG, "re-prepared after shift, behind=" + shiftMs + " ms");
                 }
                 if (playbackState != Player.STATE_ENDED) return;
                 shifting = false;

@@ -820,12 +820,15 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
         }
 
         PlaybackStateCompat.Builder playbackStateBuilder = new PlaybackStateCompat.Builder();
-        playbackStateBuilder.setActions(actions);
-        playbackStateBuilder.addCustomAction(ACTION_SKIP_BACK, "Back 5s", R.drawable.ic_replay5_24dp);
         final boolean local = radioPlayer != null && radioPlayer.isLocalFile();
-        if (local) {
+        // Time-shift seek bar: position = playhead within the buffered span (see metadata duration).
+        final long span = !local && radioPlayer != null ? radioPlayer.getTimeShiftSpanMs() : -1;
+        final boolean seekBar = span >= MIN_SEEKBAR_SPAN_MS;
+        if (local || seekBar) {
             actions |= PlaybackStateCompat.ACTION_SEEK_TO;
         }
+        playbackStateBuilder.setActions(actions);
+        playbackStateBuilder.addCustomAction(ACTION_SKIP_BACK, "Back 5s", R.drawable.ic_replay5_24dp);
         if (radioPlayer != null && radioPlayer.getBehindLiveMs() > 0)
             playbackStateBuilder.addCustomAction(ACTION_GO_LIVE, "Go live", R.drawable.ic_golive_24dp);
         if (!local) playbackStateBuilder.addCustomAction(CUSTOM_RECORD,
@@ -850,7 +853,13 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
             playbackStateBuilder.setErrorMessage(PlaybackStateCompat.ERROR_CODE_ACTION_ABORTED, error);
         }
 
-        long position = local ? radioPlayer.getPositionMs() : PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN;
+        long position = PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN;
+        if (local) {
+            position = radioPlayer.getPositionMs();
+        } else if (seekBar) {
+            long p = radioPlayer.getTimeShiftPositionMs();
+            if (p >= 0) position = Math.min(p, span);
+        }
         playbackStateBuilder.setState(state, position,
                 state == PlaybackStateCompat.STATE_PLAYING ? 1.0f : 0f);
         mediaSession.setPlaybackState(playbackStateBuilder.build());
@@ -1111,7 +1120,7 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
         handler.postDelayed(() -> {
             updateNotification();
             sendBroadCast(PLAYER_SERVICE_META_UPDATE);
-        }, 300);
+        }, radioPlayer.isLocalFile() ? 300 : 600);
     }
 
     void shiftBy(long deltaMs) {
@@ -1168,9 +1177,41 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
                     sendMessage(currentStation.Name, itsContext.getResources().getString(R.string.notify_play), currentStation.Name);
                 }
 
+                updateMediaMetadata();
+
+                setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING);
+                startSeekBarTicker();
+
+                break;
+            case Paused:
+                sendMessage(currentStation.Name, itsContext.getResources().getString(R.string.notify_paused), currentStation.Name);
+
+                if (lastErrorFromPlayer != -1) {
+                    setMediaPlaybackState(PlaybackStateCompat.STATE_ERROR);
+                } else {
+                    setMediaPlaybackState(PlaybackStateCompat.STATE_PAUSED);
+                }
+
+                break;
+        }
+    }
+
+    private static final long MIN_SEEKBAR_SPAN_MS = 1000;
+    private long lastMetadataDurationMs = Long.MIN_VALUE;
+
+    /** Duration for the media session: local file length, or the time-shift span (-1 = no bar). */
+    private long mediaDurationMs() {
+        if (radioPlayer.isLocalFile()) return radioPlayer.getDurationMs();
+        long span = radioPlayer.getTimeShiftSpanMs();
+        return span >= MIN_SEEKBAR_SPAN_MS ? span : -1;
+    }
+
+    private void updateMediaMetadata() {
                 if (mediaSession != null) {
+                    final long duration = mediaDurationMs();
+                    lastMetadataDurationMs = duration;
                     final MediaMetadataCompat.Builder builder = new MediaMetadataCompat.Builder();
-                    builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, radioPlayer.isLocalFile() ? radioPlayer.getDurationMs() : -1);
+                    builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, duration);
                     builder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM, currentStation.Name);
                     builder.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, liveInfo.getArtist());
                     builder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, liveInfo.getTrack());
@@ -1186,21 +1227,33 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
                     builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, radioIcon.getBitmap());
                     mediaSession.setMetadata(builder.build());
                 }
+    }
 
-                setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING);
-
-                break;
-            case Paused:
-                sendMessage(currentStation.Name, itsContext.getResources().getString(R.string.notify_paused), currentStation.Name);
-
-                if (lastErrorFromPlayer != -1) {
-                    setMediaPlaybackState(PlaybackStateCompat.STATE_ERROR);
-                } else {
-                    setMediaPlaybackState(PlaybackStateCompat.STATE_PAUSED);
-                }
-
-                break;
+    /**
+     * While playing, refresh the seek bar about once a second: the playback state (position,
+     * speed 1 so it animates in between) and the duration whenever the span changed.
+     */
+    private final Runnable seekBarTick = new Runnable() {
+        @Override
+        public void run() {
+            if (radioPlayer == null || mediaSession == null || currentStation == null
+                    || radioPlayer.getPlayState() != PlayState.Playing || radioPlayer.isLocalFile()) {
+                return;
+            }
+            long duration = mediaDurationMs();
+            if (duration != lastMetadataDurationMs
+                    && (duration < 0 || lastMetadataDurationMs < 0 || Math.abs(duration - lastMetadataDurationMs) >= 1000)) {
+                updateMediaMetadata();
+            }
+            setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING);
+            handler.postDelayed(this, 1000);
         }
+    };
+
+    private void startSeekBarTicker() {
+        if (handler == null) return;
+        handler.removeCallbacks(seekBarTick);
+        handler.postDelayed(seekBarTick, 1000);
     }
 
     private void downloadRadioIcon() {
