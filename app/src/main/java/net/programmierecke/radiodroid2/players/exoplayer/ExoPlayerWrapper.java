@@ -655,6 +655,13 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
             int retryDelay = getSanitizedRetryDelaySettingsMs();
             IOException exception = loadErrorInfo.exception;
 
+            if (timeShift != null && exception instanceof com.google.android.exoplayer2.ParserException) {
+                // The time-shift ring is local: retrying the same bytes every few ms can never
+                // succeed (this looped forever in BUFFERING). Surface it so the decoder-error
+                // recovery reopens on a clean boundary, or playback stops after 5 tries.
+                Log.d(TimeShiftBuffer.LOG, "parser error on time-shift data, not retrying: " + exception);
+                return C.TIME_UNSET;
+            }
             if (exception instanceof HttpDataSource.InvalidContentTypeException) {
                 stateListener.onPlayerError(R.string.error_play_stream);
                 return C.TIME_UNSET; // Immediately surface error if we cannot play content type

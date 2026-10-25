@@ -164,11 +164,17 @@ public class TimeShiftBuffer {
         private byte[] pend = new byte[64 * 1024];
         private int len;
         private boolean synced;
-        private int mode; // 0 detect, 1 framed, 2 raw
+        private int mode; // 0 detect, 1 framed, 2 raw, 3 ogg pages
+        private volatile byte[] oggHeaders;   // header pages (granule 0), replayed before every reader
+        private boolean oggHeadersDone;
+        private java.io.ByteArrayOutputStream oggHeaderBuf;
         private long detectSeen;
         long dropped;
 
         boolean framed() { return mode == 1; }
+        boolean ogg() { return mode == 3; }
+        /** Ogg header pages once complete (first audio page seen), else null. */
+        byte[] oggHeaders() { return oggHeaders; }
 
         void newConnection() {
             if (len > 0 && mode != 2) dropped += len;
@@ -181,6 +187,11 @@ public class TimeShiftBuffer {
             if (len + n > pend.length) pend = java.util.Arrays.copyOf(pend, Math.max(pend.length * 2, len + n));
             System.arraycopy(b, 0, pend, len, n);
             len += n;
+            if (mode == 0 && detectSeen == 0 && len >= 4 && OggPages.isPage(pend, 0)) {
+                Log.d(LOG, "framer: Ogg stream, storing whole pages");
+                mode = 3;
+            }
+            if (mode == 3) { pushOgg(); return; }
             if (mode == 0) detectSeen += n;
             int p = 0;
             while (len - p >= MpegFrames.HEADER) {
@@ -218,6 +229,44 @@ public class TimeShiftBuffer {
                 len = 0;
             }
         }
+    }
+
+    /**
+     * Ogg (Opus/Vorbis/FLAC): only whole pages go into the ring. The header pages at the start of
+     * the stream (granule 0) are kept aside and replayed in front of every reader, because the
+     * decoder cannot start mid-stream without them. Header pages sent again after a reconnect
+     * are dropped.
+     */
+    private void pushOgg() throws IOException, InterruptedException {
+        Framer f = framer;
+        int p = 0;
+        while (f.len - p >= OggPages.MIN_HEADER) {
+            if (!OggPages.isPage(f.pend, p)) {
+                int next = OggPages.find(f.pend, p + 1, f.len);
+                int to = next < 0 ? Math.max(p, f.len - 3) : next;
+                f.dropped += to - p;
+                p = to;
+                if (next < 0) break;
+                continue;
+            }
+            int pl = OggPages.pageLength(f.pend, p, f.len);
+            if (pl < 0) break; // need more bytes
+            if (OggPages.granule(f.pend, p) == 0) {
+                if (!f.oggHeadersDone) {
+                    if (f.oggHeaderBuf == null) f.oggHeaderBuf = new java.io.ByteArrayOutputStream();
+                    f.oggHeaderBuf.write(f.pend, p, pl);
+                } // else: headers repeated after a reconnect
+            } else {
+                if (!f.oggHeadersDone) {
+                    f.oggHeadersDone = true;
+                    f.oggHeaders = f.oggHeaderBuf != null ? f.oggHeaderBuf.toByteArray() : new byte[0];
+                    Log.d(LOG, "ogg headers: " + f.oggHeaders.length + " bytes");
+                }
+                write(f.pend, p, pl);
+            }
+            p += pl;
+        }
+        if (p > 0) { System.arraycopy(f.pend, p, f.pend, 0, f.len - p); f.len -= p; }
     }
 
     /** Bytes the writer may add now without overwriting unread data (tests). */
@@ -368,6 +417,7 @@ public class TimeShiftBuffer {
             target = Math.min(target, live);
         }
         target = Math.max(target, oldest());
+        if (framer.ogg()) target = alignToPage(target);
         // the old reader is going away: its unread bytes are free again
         generation++;
         readerPos = target;
@@ -384,6 +434,7 @@ public class TimeShiftBuffer {
 
     /** Next frame boundary at or after pos (ring holds whole frames only when framed). */
     private long alignToFrame(long pos) {
+        if (framer.ogg()) return alignToPage(pos);
         if (!framer.framed() || pos >= written) return Math.min(pos, written);
         int n = (int) Math.min(16 * 1024, written - pos);
         byte[] b = new byte[n];
@@ -401,6 +452,25 @@ public class TimeShiftBuffer {
             return written;
         }
         return pos + i;
+    }
+
+    /** Next Ogg page start at or after pos (the ring holds whole pages only). */
+    private long alignToPage(long pos) {
+        pos = Math.max(pos, oldest());
+        while (pos < written) {
+            int n = (int) Math.min(64 * 1024, written - pos);
+            byte[] b = new byte[n];
+            try {
+                ring.read(pos, b, 0, n);
+            } catch (IOException e) {
+                return pos;
+            }
+            int i = OggPages.find(b, 0, n);
+            if (i >= 0) return pos + i;
+            if (n < 4) break;
+            pos += n - 3;
+        }
+        return written;
     }
 
     /** After a decoder error: restart the reader just past what is heard, on a frame boundary. */
@@ -425,6 +495,10 @@ public class TimeShiftBuffer {
         private long pos;
         private int gen = -1;
         private Uri openUri;
+        private long requested;        // dataSpec.position (bytes of the virtual stream)
+        private boolean resolved;
+        private byte[] prefix;         // Ogg header pages served before the ring data
+        private int prefixPos;
 
         @Override
         public void addTransferListener(@NonNull TransferListener transferListener) { }
@@ -437,13 +511,38 @@ public class TimeShiftBuffer {
                     startPos = written; // first start: live
                 }
                 gen = generation;
-                pos = Math.max(oldest(), startPos + Math.max(0, dataSpec.position));
+                requested = Math.max(0, dataSpec.position);
+                resolved = false;
+                prefix = null;
+                prefixPos = 0;
+                pos = Math.max(oldest(), startPos + requested);
                 readerPos = pos;
                 Log.d(LOG, "reader open: startPos=" + startPos + " written=" + written + " pos=" + pos
-                        + " oldest=" + oldest());
+                        + " oldest=" + oldest() + " requested=" + requested);
                 TimeShiftBuffer.this.notifyAll();
             }
             return C.LENGTH_UNSET;
+        }
+
+        /**
+         * On the first read, once the stream type is known: an Ogg reader sees the header pages
+         * first and then the ring from a page boundary (the virtual stream is headers + ring).
+         */
+        private void resolve() {
+            resolved = true;
+            if (!framer.ogg()) return;
+            byte[] h = framer.oggHeaders();
+            if (h == null) h = new byte[0];
+            prefix = h;
+            if (requested < h.length) {
+                prefixPos = (int) requested;
+                pos = alignToPage(Math.max(oldest(), startPos));
+            } else {
+                prefixPos = h.length;
+                long p = Math.max(oldest(), startPos + requested - h.length);
+                pos = requested == h.length ? alignToPage(p) : p;
+            }
+            readerPos = pos;
         }
 
         @Override
@@ -451,11 +550,29 @@ public class TimeShiftBuffer {
             if (length == 0) return 0;
             synchronized (TimeShiftBuffer.this) {
                 long deadline = System.currentTimeMillis() + 20000;
-                if (gen != generation) return C.RESULT_END_OF_INPUT; // replaced by a newer reader
-                while (written <= pos) {
-                    if (gen != generation) return C.RESULT_END_OF_INPUT;
+                while (true) {
+                    if (gen != generation) return C.RESULT_END_OF_INPUT; // replaced by a newer reader
                     if (error != null) throw error;
                     if (stopped) return C.RESULT_END_OF_INPUT;
+                    // the stream type (and Ogg headers) are known once anything was written
+                    if (!resolved && written > 0) resolve();
+                    if (resolved && prefix != null && prefixPos < prefix.length) {
+                        int n = Math.min(length, prefix.length - prefixPos);
+                        System.arraycopy(prefix, prefixPos, target, offset, n);
+                        prefixPos += n;
+                        return n;
+                    }
+                    if (resolved && pos < oldest()) {
+                        pos = framer.ogg() ? alignToPage(oldest()) : oldest(); // only after a seek to very old data
+                    }
+                    if (resolved && written > pos) {
+                        int avail = (int) Math.min(length, written - pos);
+                        ring.read(pos, target, offset, avail);
+                        pos += avail;
+                        readerPos = pos;
+                        TimeShiftBuffer.this.notifyAll(); // writer may be waiting for room
+                        return avail;
+                    }
                     long wait = deadline - System.currentTimeMillis();
                     if (wait <= 0) throw new IOException("time-shift: no data from stream");
                     try {
@@ -464,13 +581,6 @@ public class TimeShiftBuffer {
                         throw new java.io.InterruptedIOException();
                     }
                 }
-                if (pos < oldest()) pos = oldest(); // only after a seek to very old data
-                int avail = (int) Math.min(length, written - pos);
-                ring.read(pos, target, offset, avail);
-                pos += avail;
-                readerPos = pos;
-                TimeShiftBuffer.this.notifyAll(); // writer may be waiting for room
-                return avail;
             }
         }
 
