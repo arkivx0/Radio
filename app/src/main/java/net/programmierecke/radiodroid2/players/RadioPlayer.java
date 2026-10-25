@@ -161,14 +161,14 @@ public class RadioPlayer implements PlayerWrapper.PlayListener, Recordable {
         });
     }
 
-    /** Time-shift span (ms) for a live stream, -1 if none. */
-    public long getTimeShiftSpanMs() {
+    /** Fixed time-shift seek bar length (ms) for a live stream, -1 if none. */
+    public long getTimeShiftBarMs() {
         if (currentPlayer instanceof net.programmierecke.radiodroid2.players.exoplayer.ExoPlayerWrapper)
-            return ((net.programmierecke.radiodroid2.players.exoplayer.ExoPlayerWrapper) currentPlayer).getTimeShiftSpanMs();
+            return ((net.programmierecke.radiodroid2.players.exoplayer.ExoPlayerWrapper) currentPlayer).getTimeShiftBarMs();
         return -1;
     }
 
-    /** Playhead within the time-shift span (ms), -1 if none. */
+    /** Thumb on the time-shift bar (ms), -1 if none. */
     public long getTimeShiftPositionMs() {
         if (currentPlayer instanceof net.programmierecke.radiodroid2.players.exoplayer.ExoPlayerWrapper)
             return ((net.programmierecke.radiodroid2.players.exoplayer.ExoPlayerWrapper) currentPlayer).getTimeShiftPositionMs();

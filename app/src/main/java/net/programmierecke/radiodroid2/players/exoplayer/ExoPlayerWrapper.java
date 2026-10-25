@@ -317,25 +317,23 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
         return true;
     }
 
-    /** Seekable time-shift span in ms (oldest kept audio to live), or -1 when not available. */
-    public long getTimeShiftSpanMs() {
+    /** Fixed seek bar length for the media session (buffer size), or -1 when not available. */
+    public long getTimeShiftBarMs() {
         if (!canTimeShift() || localFile) return -1;
-        return timeShift.spanMs(Math.max(0, player.getCurrentPosition()));
+        return timeShift.barMs();
     }
 
-    /** Playhead within {@link #getTimeShiftSpanMs()}, in ms. */
+    /** Thumb on that bar: bar length minus the offset behind live (right end = live). */
     public long getTimeShiftPositionMs() {
         if (!canTimeShift() || localFile) return -1;
-        long span = getTimeShiftSpanMs();
-        // While re-preparing the player position restarts at 0; use the offset just set.
-        if (shifting) return Math.max(0, span - shiftMs);
-        return Math.min(span, timeShift.positionInSpanMs(Math.max(0, player.getCurrentPosition())));
+        long bar = timeShift.barMs();
+        return Math.max(0, bar - Math.min(bar, getBehindLiveMs()));
     }
 
-    /** Move the playhead to positionMs within the time-shift span; the end means live. Player thread. */
+    /** Move the thumb to positionMs on the bar (clamped to available audio); the end means live. Player thread. */
     public void seekInTimeShift(long positionMs) {
         if (!canTimeShift() || localFile) return;
-        long delta = timeShift.deltaForSpanPosition(Math.max(0, player.getCurrentPosition()), positionMs);
+        long delta = timeShift.deltaForBarPosition(Math.max(0, player.getCurrentPosition()), positionMs);
         if (delta == Long.MIN_VALUE && getBehindLiveMs() == 0) return; // already live
         shiftBy(delta);
     }

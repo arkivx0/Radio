@@ -322,28 +322,32 @@ public class TimeShiftBuffer {
         return Math.max(oldest(), live - bytes(maxBehindMs));
     }
 
-    /** Seekable span for the media session: oldest usable audio up to live, in ms. */
-    public synchronized long spanMs(long playedMs) {
-        long live = live(playedMs);
-        return ms(Math.max(0, live - seekStart(live)));
-    }
+    /** Fixed length of the media session seek bar: the configured buffer size (max offset). */
+    public long barMs() { return maxBehindMs; }
 
-    /** Playhead within {@link #spanMs}, in ms. */
-    public synchronized long positionInSpanMs(long playedMs) {
+    /** Audio available behind live, in ms (never more than {@link #barMs}). */
+    public synchronized long availableMs(long playedMs) {
         long live = live(playedMs);
-        return ms(Math.max(0, playhead(playedMs) - seekStart(live)));
+        return Math.min(maxBehindMs, ms(Math.max(0, live - seekStart(live))));
     }
 
     /**
-     * Delta for {@link #shift} that moves the playhead to posMs within the span (clamped);
-     * Long.MIN_VALUE when that is within a second of live.
+     * Thumb on the fixed-length bar: the right end is live, so it is barMs - offset behind live.
+     * It does not move while playing (live and playhead advance together), so speed is 0.
      */
-    public synchronized long deltaForSpanPosition(long playedMs, long posMs) {
-        long live = live(playedMs);
-        long start = seekStart(live);
-        long target = Math.max(start, Math.min(live, start + bytes(Math.max(0, posMs))));
-        if (live - target < bytes(1000)) return Long.MIN_VALUE;
-        long d = ms(playhead(playedMs) - target);
+    public synchronized long barPositionMs(long playedMs) {
+        return Math.max(0, maxBehindMs - Math.min(maxBehindMs, behindLiveMs(playedMs)));
+    }
+
+    /**
+     * Delta for {@link #shift} that puts the thumb at posMs on the bar, clamped to the audio
+     * actually available; Long.MIN_VALUE when that is within a second of live.
+     */
+    public synchronized long deltaForBarPosition(long playedMs, long posMs) {
+        long behind = maxBehindMs - Math.max(0, Math.min(maxBehindMs, posMs));
+        behind = Math.min(behind, availableMs(playedMs));
+        if (behind < 1000) return Long.MIN_VALUE;
+        long d = behind - behindLiveMs(playedMs);
         return d == 0 ? 1 : d; // never 0, and Long.MIN_VALUE is reserved for live
     }
 

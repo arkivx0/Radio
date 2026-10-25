@@ -30,15 +30,26 @@ class TimeShiftSeekBarTest {
             now += 1000;
         }
         long played = 10_000;
-        assertEquals(10_000, ts.spanMs(played), 50);
-        assertEquals(10_000, ts.positionInSpanMs(played), 50); // at live: end of the bar
-        assertEquals(Long.MIN_VALUE, ts.deltaForSpanPosition(played, 10_000));
-        assertEquals(Long.MIN_VALUE, ts.deltaForSpanPosition(played, 99_999)); // clamped
-        assertEquals(6_000, ts.deltaForSpanPosition(played, 4_000), 50);       // 6 s back
-        assertEquals(10_000, ts.deltaForSpanPosition(played, -5), 50);          // clamped to start
-        long off = ts.shift(played, ts.deltaForSpanPosition(played, 4_000));
+        // fixed bar = buffer size (30 s); right end = live
+        assertEquals(30_000, ts.barMs());
+        assertEquals(10_000, ts.availableMs(played), 50);
+        assertEquals(30_000, ts.barPositionMs(played)); // live: pinned at the end
+        assertEquals(Long.MIN_VALUE, ts.deltaForBarPosition(played, 30_000));
+        assertEquals(Long.MIN_VALUE, ts.deltaForBarPosition(played, 99_999)); // clamped
+        assertEquals(Long.MIN_VALUE, ts.deltaForBarPosition(played, 29_500)); // within 1 s of live
+        assertEquals(6_000, ts.deltaForBarPosition(played, 24_000), 50);       // 6 s back
+        assertEquals(10_000, ts.deltaForBarPosition(played, 0), 50);           // clamped to available audio
+        long off = ts.shift(played, ts.deltaForBarPosition(played, 24_000));
         assertEquals(6_000, off, 50);
-        assertEquals(4_000, ts.positionInSpanMs(0), 50);
-        assertTrue(ts.spanMs(0) >= 10_000);
+        assertEquals(24_000, ts.barPositionMs(0), 50);
+        // playing on behind live: thumb stays put (live and playhead move together)
+        r.open(new DataSpec(Uri.EMPTY));
+        for (int s = 0; s < 5; s++) {
+            ts.write(b, b.length);
+            r.read(sink, 0, sink.length);
+            now += 1000;
+        }
+        assertEquals(24_000, ts.barPositionMs(5_000), 50);
+        assertEquals(30_000, ts.barMs()); // length never rescales
     }
 }

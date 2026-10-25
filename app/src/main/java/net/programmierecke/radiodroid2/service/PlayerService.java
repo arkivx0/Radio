@@ -821,8 +821,8 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
 
         PlaybackStateCompat.Builder playbackStateBuilder = new PlaybackStateCompat.Builder();
         final boolean local = radioPlayer != null && radioPlayer.isLocalFile();
-        // Time-shift seek bar: position = playhead within the buffered span (see metadata duration).
-        final long span = !local && radioPlayer != null ? radioPlayer.getTimeShiftSpanMs() : -1;
+        // Time-shift seek bar: fixed length (buffer size), right end = live, thumb = offset behind live.
+        final long span = !local && radioPlayer != null ? radioPlayer.getTimeShiftBarMs() : -1;
         final boolean seekBar = span >= MIN_SEEKBAR_SPAN_MS;
         if (local || seekBar) {
             actions |= PlaybackStateCompat.ACTION_SEEK_TO;
@@ -860,8 +860,11 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
             long p = radioPlayer.getTimeShiftPositionMs();
             if (p >= 0) position = Math.min(p, span);
         }
-        playbackStateBuilder.setState(state, position,
-                state == PlaybackStateCompat.STATE_PLAYING ? 1.0f : 0f);
+        lastSentBarPositionMs = seekBar ? position : -1;
+        // Live time-shift: the offset behind live stays constant while playing, so the thumb is
+        // still (speed 0) and pinned at the right end when live.
+        float speed = state == PlaybackStateCompat.STATE_PLAYING && !seekBar ? 1.0f : 0f;
+        playbackStateBuilder.setState(state, position, speed);
         mediaSession.setPlaybackState(playbackStateBuilder.build());
     }
 
@@ -1202,8 +1205,8 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
     /** Duration for the media session: local file length, or the time-shift span (-1 = no bar). */
     private long mediaDurationMs() {
         if (radioPlayer.isLocalFile()) return radioPlayer.getDurationMs();
-        long span = radioPlayer.getTimeShiftSpanMs();
-        return span >= MIN_SEEKBAR_SPAN_MS ? span : -1;
+        long bar = radioPlayer.getTimeShiftBarMs();
+        return bar >= MIN_SEEKBAR_SPAN_MS ? bar : -1;
     }
 
     private void updateMediaMetadata() {
@@ -1229,9 +1232,14 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
                 }
     }
 
+    private long lastSentBarPositionMs = -1;
+    private static final long SEEKBAR_CHECK_MS = 5000;
+    private static final long SEEKBAR_DRIFT_MS = 250;
+
     /**
-     * While playing, refresh the seek bar about once a second: the playback state (position,
-     * speed 1 so it animates in between) and the duration whenever the span changed.
+     * Safety net while playing: about every 5 s, re-send the state only if the thumb drifted
+     * more than 250 ms from the real offset (or the bar length changed). Seeks, jumps, Go live
+     * and play/pause re-send on their own.
      */
     private final Runnable seekBarTick = new Runnable() {
         @Override
@@ -1241,19 +1249,23 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
                 return;
             }
             long duration = mediaDurationMs();
-            if (duration != lastMetadataDurationMs
-                    && (duration < 0 || lastMetadataDurationMs < 0 || Math.abs(duration - lastMetadataDurationMs) >= 1000)) {
+            if (duration != lastMetadataDurationMs) {
                 updateMediaMetadata();
+                setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING);
+            } else if (duration > 0) {
+                long p = Math.min(radioPlayer.getTimeShiftPositionMs(), duration);
+                if (Math.abs(p - lastSentBarPositionMs) > SEEKBAR_DRIFT_MS) {
+                    setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING);
+                }
             }
-            setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING);
-            handler.postDelayed(this, 1000);
+            handler.postDelayed(this, SEEKBAR_CHECK_MS);
         }
     };
 
     private void startSeekBarTicker() {
         if (handler == null) return;
         handler.removeCallbacks(seekBarTick);
-        handler.postDelayed(seekBarTick, 1000);
+        handler.postDelayed(seekBarTick, SEEKBAR_CHECK_MS);
     }
 
     private void downloadRadioIcon() {
