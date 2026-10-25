@@ -38,22 +38,6 @@
     <string name="nav_item_settings">Nastavenia</string>
     <string name="nav_item_alarm">Budík</string>
     <string name="tab_player_recordings">Nahrávky</string>
-
-    <string name="about_text">Táto aplikácia používa bezplatný zoznam rádio staníc na adrese\n
-    https://www.radio-browser.info\n
-    Každý môže upravovať alebo pridávať stanice do tohoto zoznamu. Služba Radio browser funguje na princípe wiki s tým rozdieľom, že členovia komunity neupravujú články ale udržujú zoznam online (streamovateľných) rádio staníc.\n
-    \n
-    Kontakt:\n
-    segler_alex@web.de\n
-    \n
-    Nahlasovanie chýb:\n
-    https://github.com/segler-alex/Radio/issues\n
-    \n
-    Ak sa vám táto aplikácia páči a radi by ste pomohli, prosím ozvite sa emailom. Rád by som našiel niekoho so skúsenosťami v oblasti grafiky, aby mi pomohol zatraktívniť aplikáciu tak, aby bola krajšia na pohľad :) možno niekto z vás dokáže nakresliť ikony a obrázky... alebo tiež šikovní vývojári, ktorí dokážete opraviť chyby a pridať nové (vlastnosti nie chyby ;)\n
-    Nápady na nové vylepšenia sú tiež vítané!\n
-    \n
-    Táto aplikácia je poskytovaná zdarma pod licenciou GPLv3.\n
-    https://www.gnu.org/licenses/gpl-3.0.html</string>
     <string name="about_version">Verzia: %1$s</string>
     <string name="detail_star">Do obľúbených</string>
     <string name="detail_unstar">Odstrániť z obľúbených</string>
