@@ -3,7 +3,7 @@
 **Radio Arkiv** (formerly "Radio") is an unofficial fork of [RadioDroid](https://github.com/segler-alex/RadioDroid)
 by segler-alex and contributors, an Android internet-radio app built on the free
 [Radio Browser](https://www.radio-browser.info) station directory.
-Current version: **1.0.1** (based on RadioDroid 0.86).
+Current version: **1.0.2** (based on RadioDroid 0.86).
 It installs alongside upstream (`applicationId io.github.arkivx0.radio`).
 All credit for the app itself goes to the RadioDroid project. Licensed GPL-3.0 like upstream.
 
@@ -21,7 +21,8 @@ All credit for the app itself goes to the RadioDroid project. Licensed GPL-3.0 l
 - **11 skins** with swatch previews in Settings → theme: Omarchy / Tokyo Night (default), AMOLED Black,
   Gruvbox Dark, Catppuccin Mocha, Nord, Dracula, Enclave, Terminal (green phosphor), Vintage (tube radio),
   Light and Dark. Bundled OFL fonts: VT323 and Limelight.
-- **Time-shift**: skip back 5 s (repeatable, up to ~5 min) and **Go live**, with a behind-live indicator.
+- **Time-shift**: skip back 5 s (repeatable), **long-press for Back 30 s**, and **Go live**, with a behind-live indicator.
+- **Skip-back buffer setting** (Settings → Playback): 1, 2, 5 (default), 10 or 30 minutes, or Auto. Sized from the station's bitrate (128 kbps if unknown); large buffers are kept on disk in the app cache, and the summary shows the approximate storage.
 - **Lock-screen / media controls**: media notification with Back 5 s, Go live and Record actions.
 - **Scheduled recordings**: pick station, start time, duration, once or on repeat days.
 - **Silent recordings**: scheduled recordings can record without playing aloud or taking audio focus
@@ -53,8 +54,8 @@ Download `RadioArkiv.apk` from [Releases](../../releases). APKs are signed with 
 
 - Signing certificate SHA-256:
   `291e1bccf7a19a6d0542a0a4c1af02aef42d305216534d798a85dc4187254861`
-- APK SHA-256 for 1.0.1:
-  `cdcbcbd0d8d7c50eaa0f5ad8b15f7915f72dcb429a4ba3357be0d32af56de521`
+- APK SHA-256 for 1.0.2:
+  `5f8f882c5efec46fde04c9c41fa6dc6c75fddf9a40b0b89b34ac2fb4cdcba11a`
 
 Verify before installing:
 ```
