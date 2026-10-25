@@ -130,6 +130,12 @@
     <PreferenceScreen android:title="@string/settings_play"
         search:ignore="true"
         android:key="pref_category_player">
+        <ListPreference
+            android:defaultValue="5"
+            android:entries="@array/timeshift_entries"
+            android:entryValues="@array/timeshift_values"
+            android:key="timeshift_minutes"
+            android:title="@string/settings_timeshift" />
 
         <CheckBoxPreference
             android:disableDependentsState="true"

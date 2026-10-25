@@ -127,6 +127,9 @@ public class RadioPlayer implements PlayerWrapper.PlayListener, Recordable {
             return;
         }
 
+        if (currentPlayer instanceof net.programmierecke.radiodroid2.players.exoplayer.ExoPlayerWrapper) {
+            ((net.programmierecke.radiodroid2.players.exoplayer.ExoPlayerWrapper) currentPlayer).setExpectedBitrateKbps(station.Bitrate);
+        }
         playStationTask = new PlayStationTask(station, mainContext,
                 (url) -> RadioPlayer.this.play(station.playableUrl, station.Name, isAlarm),
                 (executionResult) -> {

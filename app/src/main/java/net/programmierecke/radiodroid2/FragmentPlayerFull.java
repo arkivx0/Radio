@@ -246,6 +246,11 @@ public class FragmentPlayerFull extends Fragment {
         btnRecord = view.findViewById(R.id.buttonRecord);
         textBehindLive = view.findViewById(R.id.textBehindLive);
         view.findViewById(R.id.buttonBack5).setOnClickListener(v -> PlayerServiceUtil.shiftBy(5000));
+        view.findViewById(R.id.buttonBack5).setOnLongClickListener(v -> {
+            PlayerServiceUtil.shiftBy(30000);
+            Toast.makeText(requireContext(), R.string.player_back_30s, Toast.LENGTH_SHORT).show();
+            return true;
+        });
         view.findViewById(R.id.buttonGoLive).setOnClickListener(v -> PlayerServiceUtil.shiftBy(Long.MIN_VALUE));
         btnFavourite = view.findViewById(R.id.buttonFavorite);
 
@@ -508,8 +513,10 @@ public class FragmentPlayerFull extends Fragment {
 
             artAndInfoPagerAdapter.textViewStationDescription.setText(station.getLongDetails(requireContext()));
 
-            String[] tags = station.TagsAll.split(",");
-            artAndInfoPagerAdapter.viewTags.setTags(Arrays.asList(tags));
+            // Local files and some stations have no tags (was a NullPointerException)
+            List<String> tags = TextUtils.isEmpty(station.TagsAll)
+                    ? new ArrayList<>() : Arrays.asList(station.TagsAll.split(","));
+            artAndInfoPagerAdapter.viewTags.setTags(tags);
             //artAndInfoPagerAdapter.viewTags.setTagSelectionCallback(tagSelectionCallback);
         }
 

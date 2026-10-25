@@ -54,6 +54,18 @@ public class FragmentSettings extends PreferenceFragmentCompat implements Shared
         return getPreferenceScreen() == null || getPreferenceScreen().getKey().equals("pref_toplevel");
     }
 
+    private void updateTimeShiftSummary(androidx.preference.ListPreference p, String value) {
+        if (value == null) value = net.programmierecke.radiodroid2.players.exoplayer.TimeShiftSettings.DEFAULT;
+        int idx = p.findIndexOfValue(value);
+        CharSequence label = idx >= 0 ? p.getEntries()[idx] : value;
+        int kbps = 320;
+        int cap = net.programmierecke.radiodroid2.players.exoplayer.TimeShiftSettings.capacityFor(value, kbps);
+        p.setSummary(getString(R.string.settings_timeshift_summary, label,
+                net.programmierecke.radiodroid2.players.exoplayer.TimeShiftSettings.approxMb(value, kbps), kbps,
+                getString(net.programmierecke.radiodroid2.players.exoplayer.TimeShiftSettings.useDisk(cap)
+                        ? R.string.settings_timeshift_disk : R.string.settings_timeshift_ram)));
+    }
+
     private void refreshToplevelIcons() {
         findPreference("shareapp_package").setSummary(getPreferenceManager().getSharedPreferences().getString("shareapp_package", ""));
         findPreference("pref_category_ui").setIcon(Utils.IconicsIcon(getContext(), CommunityMaterial.Icon2.cmd_monitor));
@@ -143,6 +155,15 @@ public class FragmentSettings extends PreferenceFragmentCompat implements Shared
                     return false;
                 }
             });
+        } else if (s.equals("pref_category_player")) {
+            androidx.preference.ListPreference ts = findPreference("timeshift_minutes");
+            if (ts != null) {
+                updateTimeShiftSummary(ts, ts.getValue());
+                ts.setOnPreferenceChangeListener((p, v) -> {
+                    updateTimeShiftSummary((androidx.preference.ListPreference) p, (String) v);
+                    return true;
+                });
+            }
         } else if (s.equals("pref_category_recordings")) {
             findPreference("rec_open_schedules").setOnPreferenceClickListener(preference -> {
                 startActivity(new Intent(requireContext(), net.programmierecke.radiodroid2.recording.ActivityRecordSchedules.class));

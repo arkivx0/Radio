@@ -84,6 +84,13 @@ public class DataRadioStation implements Parcelable {
 		s.StreamUrl = url;
 		s.playableUrl = url;
 		s.IconUrl = "";
+		s.TagsAll = "";
+		s.Country = "";
+		s.CountryCode = "";
+		s.State = "";
+		s.Language = "";
+		s.Codec = "";
+		s.HomePageUrl = "";
 		return s;
 	}
 

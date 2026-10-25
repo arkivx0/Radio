@@ -160,7 +160,7 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
             }
         } else if (!isHls) {
             // Radio fork: route progressive streams through the time-shift ring buffer
-            timeShift = new TimeShiftBuffer(dataSourceFactory, Uri.parse(streamUrl));
+            timeShift = createTimeShift(dataSourceFactory, Uri.parse(streamUrl), prefs);
             timeShift.start();
             shiftMs = 0;
             audioSource = new ProgressiveMediaSource.Factory(timeShift.readerFactory())
@@ -185,6 +185,33 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
 
     private TimeShiftBuffer timeShift;
     private long shiftMs;
+    private int expectedBitrateKbps;
+
+    /** Station's declared bitrate, used to size the skip-back buffer in minutes. */
+    public void setExpectedBitrateKbps(int kbps) {
+        expectedBitrateKbps = kbps;
+    }
+
+    private TimeShiftBuffer createTimeShift(DataSource.Factory upstream, Uri uri, SharedPreferences prefs) {
+        String pref = prefs.getString(TimeShiftSettings.PREF_KEY, TimeShiftSettings.DEFAULT);
+        int kbps = expectedBitrateKbps;
+        int capacity = TimeShiftSettings.capacityFor(pref, kbps);
+        long maxBehind = TimeShiftSettings.maxBehindMsFor(pref, kbps);
+        RingStore store = null;
+        if (TimeShiftSettings.useDisk(capacity)) {
+            try {
+                store = new RingStore.Disk(new java.io.File(context.getCacheDir(), "timeshift.buf"), capacity);
+            } catch (java.io.IOException e) {
+                Log.w(TAG, "disk time-shift buffer unavailable, using RAM", e);
+            }
+        }
+        if (store == null) {
+            int ramCap = Math.min(capacity, TimeShiftSettings.MAX_RAM_BYTES);
+            store = new RingStore.Memory(ramCap);
+            maxBehind = Math.min(maxBehind, (ramCap - 256 * 1024) * 8000L / (TimeShiftSettings.effectiveKbps(kbps) * 1000L));
+        }
+        return new TimeShiftBuffer(upstream, uri, store, maxBehind, kbps);
+    }
 
     // Radio fork: local file playback state
     private boolean localFile;
@@ -238,7 +265,10 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
             return;
         }
         if (!canTimeShift()) return;
-        long target = deltaMs == Long.MIN_VALUE ? 0 : Math.max(0, shiftMs + deltaMs);
+        // Measure from what is actually heard: reader cursor behind live plus the player's own
+        // read-ahead. Using only the last requested shift made Back 5s land near the live edge.
+        long heardBehind = timeShift.readerBehindMs() + Math.max(0, getBufferedMs());
+        long target = deltaMs == Long.MIN_VALUE ? 0 : Math.max(0, heardBehind + deltaMs);
         target = Math.min(target, timeShift.maxBehindMs());
         shiftMs = timeShift.seekBehind(target);
         if (shiftMs < 1000) shiftMs = 0;

@@ -20,23 +20,31 @@ import java.io.IOException;
  */
 public class TimeShiftBuffer {
     private static final String TAG = "TimeShift";
-    private static final int CAPACITY = 16 * 1024 * 1024; // ~7 min @320k, ~17 min @128k
-    private static final long MAX_BEHIND_MS = 5 * 60 * 1000;
+    private static final int MARGIN = 64 * 1024;
 
-    private final byte[] ring = new byte[CAPACITY];
+    private final RingStore ring;
+    private final int capacity;
+    private final long maxBehindMs;
+    private final double knownBytesPerSecond;
     private long written;          // total bytes ever written
     private long firstByteTime;    // ms when first byte arrived
     private volatile boolean stopped;
     private volatile IOException error;
-    private long nextStart = -1;
+    // Start position used by every reader open until the next seek (ExoPlayer may open more than once).
+    private long startPos = -1;
     private volatile long readerPos;    // cursor of current reader
     private final DataSource.Factory upstreamFactory;
     private final Uri uri;
     private Thread feeder;
 
-    public TimeShiftBuffer(@NonNull DataSource.Factory upstreamFactory, @NonNull Uri uri) {
+    public TimeShiftBuffer(@NonNull DataSource.Factory upstreamFactory, @NonNull Uri uri,
+                           @NonNull RingStore ring, long maxBehindMs, int bitrateKbps) {
         this.upstreamFactory = upstreamFactory;
         this.uri = uri;
+        this.ring = ring;
+        this.capacity = ring.capacity();
+        this.maxBehindMs = maxBehindMs;
+        this.knownBytesPerSecond = bitrateKbps > 0 ? bitrateKbps * 1000.0 / 8.0 : 0;
     }
 
     public void start() {
@@ -49,6 +57,7 @@ public class TimeShiftBuffer {
         stopped = true;
         if (feeder != null) feeder.interrupt();
         synchronized (this) { notifyAll(); }
+        ring.close();
     }
 
     private void feed() {
@@ -65,6 +74,7 @@ public class TimeShiftBuffer {
                     if (n > 0) write(buf, n);
                 }
             } catch (IOException e) {
+                if (stopped) return;
                 Log.w(TAG, "feeder error", e);
                 if (++failures > 5) {
                     error = e;
@@ -80,18 +90,17 @@ public class TimeShiftBuffer {
         }
     }
 
-    private synchronized void write(byte[] b, int n) {
+    private synchronized void write(byte[] b, int n) throws IOException {
+        if (stopped) return;
         if (written == 0) firstByteTime = System.currentTimeMillis();
-        int pos = (int) (written % CAPACITY);
-        int first = Math.min(n, CAPACITY - pos);
-        System.arraycopy(b, 0, ring, pos, first);
-        if (first < n) System.arraycopy(b, first, ring, 0, n - first);
+        ring.write(written, b, 0, n);
         written += n;
         notifyAll();
     }
 
-    /** Estimated stream bytes per second (falls back to 128 kbit/s). */
+    /** Stream bytes per second: the stream's declared bitrate, else measured, else 128 kbit/s. */
     public synchronized double bytesPerSecond() {
+        if (knownBytesPerSecond > 0) return knownBytesPerSecond;
         long el = System.currentTimeMillis() - firstByteTime;
         // ignore initial burst: needs at least 20 s of data
         if (written > 0 && el > 20000) return Math.max(2000, written * 1000.0 / el);
@@ -99,15 +108,15 @@ public class TimeShiftBuffer {
     }
 
     private synchronized long oldest() {
-        return Math.max(0, written - CAPACITY + 64 * 1024);
+        return Math.max(0, written - capacity + MARGIN);
     }
 
     /** Set where the next reader starts: msBehind = 0 is live. Returns actual ms behind. */
     public synchronized long seekBehind(long msBehind) {
-        msBehind = Math.max(0, Math.min(msBehind, MAX_BEHIND_MS));
+        msBehind = Math.max(0, Math.min(msBehind, maxBehindMs));
         long pos = written - (long) (msBehind * bytesPerSecond() / 1000.0);
         pos = Math.max(pos, oldest());
-        nextStart = pos;
+        startPos = msBehind == 0 ? -1 : pos;
         return (long) ((written - pos) * 1000.0 / bytesPerSecond());
     }
 
@@ -117,7 +126,7 @@ public class TimeShiftBuffer {
     }
 
     public synchronized long maxBehindMs() {
-        return Math.min(MAX_BEHIND_MS, (long) ((written - oldest()) * 1000.0 / bytesPerSecond()));
+        return Math.min(maxBehindMs, (long) ((written - oldest()) * 1000.0 / bytesPerSecond()));
     }
 
     public DataSource.Factory readerFactory() {
@@ -135,8 +144,9 @@ public class TimeShiftBuffer {
         public long open(@NonNull DataSpec dataSpec) throws IOException {
             openUri = dataSpec.uri;
             synchronized (TimeShiftBuffer.this) {
-                pos = nextStart >= 0 ? nextStart : written;
-                nextStart = -1;
+                long base = startPos >= 0 ? startPos : written;
+                if (startPos < 0) startPos = base; // reopen of the same prepare keeps its start
+                pos = Math.max(oldest(), base + Math.max(0, dataSpec.position));
                 readerPos = pos;
             }
             return C.LENGTH_UNSET;
@@ -160,10 +170,7 @@ public class TimeShiftBuffer {
                 }
                 if (pos < oldest()) pos = oldest(); // overrun: jump forward
                 int avail = (int) Math.min(length, written - pos);
-                int rp = (int) (pos % CAPACITY);
-                int first = Math.min(avail, CAPACITY - rp);
-                System.arraycopy(ring, rp, target, offset, first);
-                if (first < avail) System.arraycopy(ring, 0, target, offset + first, avail - first);
+                ring.read(pos, target, offset, avail);
                 pos += avail;
                 readerPos = pos;
                 return avail;
