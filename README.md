@@ -10,6 +10,7 @@ All credit for the app itself goes to the RadioDroid project. Licensed GPL-3.0 l
   <img src="docs/screenshots/stations.png" width="250" alt="Station list" />
   <img src="docs/screenshots/player.png" width="250" alt="Player with codec line and -5s / Live controls" />
   <img src="docs/screenshots/recordings.png" width="250" alt="Player with the Recordings tab" />
+  <img src="docs/screenshots/favorite.png" width="250" alt="Player with a favourite station" />
 </p>
 <p align="center"><em>Stations shown are a random selection picked from the public directory for screenshots and testing, not an endorsement.</em></p>
 
