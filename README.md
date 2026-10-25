@@ -24,6 +24,7 @@ All credit for the app itself goes to the RadioDroid project. Licensed GPL-3.0 l
 - **Time-shift**: skip back 5 s (repeatable), **long-press for Back 30 s**, and **Go live**, with a behind-live indicator.
 - **Skip-back buffer setting** (Settings → Playback): 1, 2, 5 (default), 10 or 30 minutes, or Auto. Sized from the station's bitrate (128 kbps if unknown); large buffers are kept on disk in the app cache, and the summary shows the approximate storage.
 - **Lock-screen / media controls**: media notification with Back 5 s, Go live and Record actions.
+- **Lock-screen seek bar** (new in 1.0.4): see and drag through the rewind buffer right from the lock screen or notification; drag to the end to go live.
 - **Scheduled recordings**: pick station, start time, duration, once or on repeat days.
 - **Silent recordings**: scheduled recordings can record without playing aloud or taking audio focus
   (per-schedule *Record silently* option, on by default; off keeps play-while-recording). There is also
